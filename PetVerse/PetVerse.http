@@ -1,0 +1,11 @@
+POST http://localhost:5224/api/posts
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "content": "Authenticated post"
+}
+
+###
+
+GET http://localhost:5224/api/posts
