@@ -2,7 +2,7 @@ namespace PetVerse.DTOs
 {
     public class CreatePostDto
     {
-        public string? Content { get; set; }
+        public required string Content { get; set; }
     }
 }
 
