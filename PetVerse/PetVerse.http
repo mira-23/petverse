@@ -3,6 +3,7 @@ Authorization: Bearer YOUR_JWT_TOKEN_HERE
 Content-Type: application/json
 
 {
+  "title" : "Post title",
   "content": "Authenticated post"
 }
 
