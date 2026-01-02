@@ -1,11 +1,10 @@
 using PetVerse.Data;
 using PetVerse.DTOs;
-using PetVerse.Interfaces;
 using PetVerse.Models;
 
 namespace PetVerse.Services
 {
-    public class PostService : IPostService
+    public class PostService
     {
         private readonly AppDbContext _context;
 
@@ -18,12 +17,19 @@ namespace PetVerse.Services
         {
             var post = new Post
             {
+                Title = dto.Title,
                 Content = dto.Content,
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
+
+            // return new CreatePostDto
+            // {
+            //     Title = post.Title,
+            //     Content = post.Content,
+            // };
         }
     }
 
