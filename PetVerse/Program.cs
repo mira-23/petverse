@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PetVerse.Data;
+using PetVerse.Entities;
 using PetVerse.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,10 +13,15 @@ builder.Services.AddControllers();
 // builder.Services.AddDbContext<AppDbContext>(options =>
 //     options.UseInMemoryDatabase("MockDb"));
 
+//(localdb)\mssqllocaldb
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>();
 
 // Services
 builder.Services.AddScoped<PostService>();
