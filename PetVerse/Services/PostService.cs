@@ -24,12 +24,6 @@ namespace PetVerse.Services
 
             _context.Posts.Add(post);
             await _context.SaveChangesAsync();
-
-            // return new CreatePostDto
-            // {
-            //     Title = post.Title,
-            //     Content = post.Content,
-            // };
         }
     }
 
