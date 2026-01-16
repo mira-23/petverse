@@ -4718,19 +4718,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\mira\\.nuget\\packages\\": {}
+    "C:\\Users\\mira\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mira\\Desktop\\Programming Main Folder\\PetVerse\\PetVerse\\PetVerse\\PetVerse.csproj",
+      "projectUniqueName": "E:\\GitHub Repos\\Pet Project Test\\PetVerse\\PetVerse\\PetVerse.csproj",
       "projectName": "PetVerse",
-      "projectPath": "C:\\Users\\mira\\Desktop\\Programming Main Folder\\PetVerse\\PetVerse\\PetVerse\\PetVerse.csproj",
+      "projectPath": "E:\\GitHub Repos\\Pet Project Test\\PetVerse\\PetVerse\\PetVerse.csproj",
       "packagesPath": "C:\\Users\\mira\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mira\\Desktop\\Programming Main Folder\\PetVerse\\PetVerse\\PetVerse\\obj\\",
+      "outputPath": "E:\\GitHub Repos\\Pet Project Test\\PetVerse\\PetVerse\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
         "C:\\Users\\mira\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4834,7 +4839,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "c:\\program files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

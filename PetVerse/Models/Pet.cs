@@ -20,10 +20,4 @@ namespace PetVerse.Models
 
         public required DateTime BirthDate { get; set; }
     }
-
-    //   "pet": {
-//     "name": "string:2-256",
-//     "kind": "list:TDB",
-//      "birthDate": "ISO-Date (2026-01-08)"
-//      "photo: "binary"
 }

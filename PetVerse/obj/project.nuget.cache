@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "1/jnX1LUIxQ=",
+  "dgSpecHash": "UryXKQNhojc=",
   "success": true,
-  "projectFilePath": "C:\\Users\\mira\\Desktop\\Programming Main Folder\\PetVerse\\PetVerse\\PetVerse\\PetVerse.csproj",
+  "projectFilePath": "E:\\GitHub Repos\\Pet Project Test\\PetVerse\\PetVerse\\PetVerse.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mira\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\mira\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",

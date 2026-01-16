@@ -494,3 +494,7 @@ C:\Users\mira\Desktop\Programming Main Folder\PetVerse\PetVerse\PetVerse\obj\Deb
 C:\Users\mira\Desktop\Programming Main Folder\PetVerse\PetVerse\PetVerse\obj\Debug\net10.0\PetVerse.pdb
 C:\Users\mira\Desktop\Programming Main Folder\PetVerse\PetVerse\PetVerse\obj\Debug\net10.0\PetVerse.genruntimeconfig.cache
 C:\Users\mira\Desktop\Programming Main Folder\PetVerse\PetVerse\PetVerse\obj\Debug\net10.0\ref\PetVerse.dll
+e:\GitHub Repos\Pet Project Test\PetVerse\PetVerse\bin\Debug\net10.0\AutoMapper.dll
+e:\GitHub Repos\Pet Project Test\PetVerse\PetVerse\bin\Debug\net10.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+e:\GitHub Repos\Pet Project Test\PetVerse\PetVerse\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+e:\GitHub Repos\Pet Project Test\PetVerse\PetVerse\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll

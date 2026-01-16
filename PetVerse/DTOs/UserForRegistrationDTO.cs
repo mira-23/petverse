@@ -33,22 +33,6 @@ namespace PetVerse.DTOs
         [Required(ErrorMessage = "Password is required")]
         public required string Password { get; set; }
 
-        [Required(ErrorMessage = "Pet is required")]
-        public required PetDTO Pet {get; set;}
-// {
-//   "username": "string:2-256",
-//   "password": "string:8-256",
-//   "firstName": "string:2-256",
-//   "lastName": "string:2-256",
-//   "phoneNumber": "optional string",
-//   "email": "string:email",
-//   "pet": {
-//     "name": "string:2-256",
-//     "kind": "list:TDB",
-//      "birthDate": "ISO-Date (2026-01-08)"
-//      "photo: "binary"
-// !VerySecurePassowrd1
-//   }
-// }
+        public PetDTO? Pet { get; set; }
     }
 }

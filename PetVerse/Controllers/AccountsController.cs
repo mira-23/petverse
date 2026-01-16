@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
 using PetVerse.Entities;
 using PetVerse.DTOs;
 using PetVerse.Services;
@@ -14,31 +13,24 @@ namespace PetVerse.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
-        private readonly IMapper _mapper;
 
         private readonly JwtService _jwtService;
 
-        public AccountsController(UserManager<User> userManager, IMapper mapper, JwtService jwtService)
+        public AccountsController(UserManager<User> userManager, JwtService jwtService)
         {
             _userManager = userManager;
-            _mapper = mapper;
             _jwtService = jwtService;
         }
 
-        [HttpPost("register")] 
+        [AllowAnonymous]
+        [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<RegistratrionResponseDTO>> RegisterUser([FromBody] UserForRegistrationDTO userForRegistrationDTO)
         {
-            if(userForRegistrationDTO == null)
+            if (userForRegistrationDTO == null)
             {
                 return BadRequest();
             }
-
-            var pet = new Pet
-            {
-                Name = userForRegistrationDTO.Pet.Name,
-                Kind = userForRegistrationDTO.Pet.Kind,
-                BirthDate = userForRegistrationDTO.Pet.BirthDate
-            };
 
             var user = new User
             {
@@ -46,16 +38,28 @@ namespace PetVerse.Controllers
                 Email = userForRegistrationDTO.Email,
                 FirstName = userForRegistrationDTO.FirstName,
                 LastName = userForRegistrationDTO.LastName,
-                PhoneNumber = userForRegistrationDTO.PhoneNumber,
-                Pet = pet
+                PhoneNumber = userForRegistrationDTO.PhoneNumber
             };
-            var result = await _userManager.CreateAsync(user,userForRegistrationDTO.Password);
 
-            if(!result.Succeeded)
+            if (userForRegistrationDTO.Pet != null)
+            {
+                var pet = new Pet
+                {
+                    Name = userForRegistrationDTO.Pet.Name,
+                    Kind = userForRegistrationDTO.Pet.Kind,
+                    BirthDate = userForRegistrationDTO.Pet.BirthDate
+                };
+
+                user.Pet = pet;
+            }
+
+            var result = await _userManager.CreateAsync(user, userForRegistrationDTO.Password);
+
+            if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(e => e.Description);
 
-                return BadRequest(new RegistratrionResponseDTO {Error = String.Join(", ", errors.ToArray())});
+                return BadRequest(new RegistratrionResponseDTO { Error = String.Join(", ", errors.ToArray()) });
             }
 
             return StatusCode(201);
@@ -81,6 +85,6 @@ namespace PetVerse.Controllers
             return Ok(new { exists = user != null });
         }
 
-        }
-   
+    }
+
 }
