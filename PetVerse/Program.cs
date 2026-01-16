@@ -53,6 +53,7 @@ using (var scope = app.Services.CreateScope())
     DbInitializer.Initialize(context);
 }
 
+
 app.UseSwagger();
 app.UseSwaggerUI();
 

@@ -1,11 +1,9 @@
 {
   "version": 2,
-  "dgSpecHash": "UryXKQNhojc=",
+  "dgSpecHash": "aP5TczO/Sv4=",
   "success": true,
   "projectFilePath": "E:\\GitHub Repos\\Pet Project Test\\PetVerse\\PetVerse\\PetVerse.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\mira\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
-    "C:\\Users\\mira\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "C:\\Users\\mira\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\mira\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",
     "C:\\Users\\mira\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
