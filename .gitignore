@@ -5,6 +5,8 @@
 
 # Custom ignores
 **/PetVerse.AssemblyInfo.cs
+bin/
+obj/
 
 # User-specific files
 *.rsuser
