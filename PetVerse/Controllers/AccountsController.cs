@@ -77,6 +77,7 @@ namespace PetVerse.Controllers
             return result;
         }
 
+        [AllowAnonymous]
         [HttpGet("verify-username")]
         public async Task<IActionResult> VerifyUserName([FromQuery] string userName)
         {
