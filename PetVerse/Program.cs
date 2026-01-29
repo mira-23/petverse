@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using PetVerse.Data;
 using PetVerse.Entities;
 using PetVerse.Services;
@@ -23,7 +24,23 @@ builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition(
+                 "Bearer",
+                 new OpenApiSecurityScheme
+                 {
+                     BearerFormat = "JWT",
+                     Name = "Authorization",
+                     In = ParameterLocation.Header,
+                     Type = SecuritySchemeType.Http,
+                     Scheme = "Bearer",
+                     Description = "Enter your JWT Access Token"
+                 }
+             );
+
+    options.AddSecurityRequirement(document => new() { [new OpenApiSecuritySchemeReference("Bearer", document)] = [] });
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -38,7 +55,10 @@ builder.Services.AddAuthentication(options =>
     {
         ValidIssuer = builder.Configuration["JwtConfig:Issuer"],
         ValidAudience = builder.Configuration["JwtConfig:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Key"]))
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Key"])),
+        ClockSkew = TimeSpan.Zero
     };
 });
 

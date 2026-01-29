@@ -44,6 +44,7 @@ namespace PetVerse.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
+                new Claim(ClaimTypes.NameIdentifier, userAccount.Id),
                 new Claim(JwtRegisteredClaimNames.Name, request.UserName)
             }),
                 Expires = tokenExpiryTimestamp,
