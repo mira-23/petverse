@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PetVerse.Models
 {
-
     public enum Kind
     {
         Dog,
