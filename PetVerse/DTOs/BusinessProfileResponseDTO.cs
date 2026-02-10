@@ -1,7 +1,8 @@
 namespace PetVerse.DTOs
 {
-    public class CreateBusinessProfileDto
+    public class BusinessProfileResponseDTO
     {
+        public int Id { get; set; }
         public required string Address { get; set; }
 
         public required byte[] Logo { get; set; }

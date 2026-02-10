@@ -20,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
+builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<JwtService>();
 
