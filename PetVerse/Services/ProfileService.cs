@@ -26,13 +26,15 @@ namespace PetVerse.Services
             if (string.IsNullOrEmpty(createBusinessProfileDto.Address) || string.IsNullOrWhiteSpace(createBusinessProfileDto.Address))
                 errors.Add("Address is required");
 
-            if (!createBusinessProfileDto.Logo.Any())
+            if (createBusinessProfileDto.Logo == null 
+            || createBusinessProfileDto.Logo.Name == null 
+            || createBusinessProfileDto.Logo.FileName == null
+            || createBusinessProfileDto.Logo.Length==0)
                 errors.Add("Logo is required");
             
             if (errors.Any())
                 throw new ValidationException(string.Join(", ", errors));
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
             var businessProfile = new BusinessProfile
                 {
                     Address = createBusinessProfileDto.Address,
@@ -41,19 +43,29 @@ namespace PetVerse.Services
                     Description = createBusinessProfileDto.Description,
                     IdentificationNumber = createBusinessProfileDto.IdentificationNumber
                 };
+                
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 _context.BusinessProfiles.Add(businessProfile);
                 await _context.SaveChangesAsync();
 
-                string path = Path.Combine(Environment.CurrentDirectory, @"Images\Logos\",$"{businessProfile.Name}_{businessProfile.Id}.png");
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                string path = Path.Combine(Environment.CurrentDirectory, "Images","Logos");
+                Directory.CreateDirectory(path);
+                
+                string extension = Path.GetExtension(createBusinessProfileDto.Logo.FileName);
+                string name = Path.GetFileNameWithoutExtension(createBusinessProfileDto.Logo.FileName);
+                string fileName = $"{name}_{businessProfile.Id}{extension}";
+                string filePath = Path.Combine(path, fileName);
+                using (Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                {
+                    createBusinessProfileDto.Logo.CopyTo(fileStream);
+                }
 
-                File.WriteAllBytes(path, createBusinessProfileDto.Logo);
-
-                businessProfile.LogoPath = path;
+                businessProfile.LogoPath = fileName;
 
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
                 return businessProfile;
             }
             catch (DbUpdateException)
@@ -64,19 +76,18 @@ namespace PetVerse.Services
             catch (IOException)
             {
                 await transaction.RollbackAsync();
-                throw new InvalidOperationException("Error writing logo file to disk");
+                throw new InvalidOperationException("Error saving logo file to disk");
             }
             catch (ArgumentException)
             {
                 await transaction.RollbackAsync();
-                throw new ValidationException("Invalid file path or logo data");
+                throw new ValidationException("Invalid file path (name possibly has invalid characters)");
             }
             catch (Exception e)
             {
                 await transaction.RollbackAsync();
                 throw new InvalidOperationException($"An error occurred while creating the business profile: {e.Message}");
             }
-            
         }
 
         internal async Task<BusinessProfile?> GetBusinessByIdAsync(int id)

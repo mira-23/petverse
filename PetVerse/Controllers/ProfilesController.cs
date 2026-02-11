@@ -21,6 +21,7 @@ namespace PetVerse.Controllers
         [Authorize]
         [HttpPost("business")]
         [ProducesResponseType(typeof(CreateBusinessProfileDto), StatusCodes.Status201Created)]
+        [Consumes("multipart/form-data")]
         public async Task<ActionResult> CreateBusinessProfile(CreateBusinessProfileDto createBusinessProfileDto)
         {
 
@@ -51,7 +52,7 @@ namespace PetVerse.Controllers
             {
                 Id = result.Id,
                 Address = result.Address,
-                LogoPath = result.LogoPath,
+                LogoPath = $"{Request.Scheme}://{Request.Host}/Images/Logos/{result.LogoPath}",
                 Name = result.Name,
                 Description = result.Description,
                 IdentificationNumber = result.IdentificationNumber
@@ -71,7 +72,7 @@ namespace PetVerse.Controllers
             {
                 Id = profile.Id,
                 Address = profile.Address,
-                LogoPath = profile.LogoPath,
+                LogoPath = $"{Request.Scheme}://{Request.Host}/Images/Logos/{profile.LogoPath}",
                 Name = profile.Name,
                 Description = profile.Description,
                 IdentificationNumber = profile.IdentificationNumber
