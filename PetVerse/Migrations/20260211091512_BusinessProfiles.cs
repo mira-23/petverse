@@ -18,7 +18,7 @@ namespace PetVerse.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IdentificationNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Logo = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    LogoPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },

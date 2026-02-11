@@ -41,6 +41,7 @@ builder.Services.AddSwaggerGen(options =>
              );
 
     options.AddSecurityRequirement(document => new() { [new OpenApiSecuritySchemeReference("Bearer", document)] = [] });
+    options.EnableAnnotations();
 });
 
 builder.Services.AddAuthentication(options =>

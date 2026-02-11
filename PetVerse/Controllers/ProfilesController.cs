@@ -27,15 +27,6 @@ namespace PetVerse.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var businessProfile = new BusinessProfile
-            {
-                Address = createBusinessProfileDto.Address,
-                Logo = createBusinessProfileDto.Logo,
-                Name = createBusinessProfileDto.Name,
-                Description = createBusinessProfileDto.Description,
-                IdentificationNumber = createBusinessProfileDto.IdentificationNumber
-            };
-
             BusinessProfile result;
 
             try
@@ -45,8 +36,11 @@ namespace PetVerse.Controllers
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
-            }
-            
+            } 
+            catch (InvalidOperationException e)
+            {
+                return StatusCode(500,e.Message);
+            } 
 
             if (result == null)
             {
@@ -57,7 +51,7 @@ namespace PetVerse.Controllers
             {
                 Id = result.Id,
                 Address = result.Address,
-                Logo = result.Logo,
+                LogoPath = result.LogoPath,
                 Name = result.Name,
                 Description = result.Description,
                 IdentificationNumber = result.IdentificationNumber
@@ -77,7 +71,7 @@ namespace PetVerse.Controllers
             {
                 Id = profile.Id,
                 Address = profile.Address,
-                Logo = profile.Logo,
+                LogoPath = profile.LogoPath,
                 Name = profile.Name,
                 Description = profile.Description,
                 IdentificationNumber = profile.IdentificationNumber

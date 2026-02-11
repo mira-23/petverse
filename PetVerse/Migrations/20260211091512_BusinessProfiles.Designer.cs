@@ -12,7 +12,7 @@ using PetVerse.Data;
 namespace PetVerse.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260210114720_BusinessProfiles")]
+    [Migration("20260211091512_BusinessProfiles")]
     partial class BusinessProfiles
     {
         /// <inheritdoc />
@@ -254,9 +254,9 @@ namespace PetVerse.Migrations
                     b.Property<string>("IdentificationNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("Logo")
+                    b.Property<string>("LogoPath")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()

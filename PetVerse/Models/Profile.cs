@@ -5,7 +5,7 @@ namespace PetVerse.Models
         public int Id { get; set; }
         public required string Address { get; set; }
 
-        public required byte[] Logo { get; set; }
+        public required string LogoPath { get; set; }
 
         public required string Name { get; set; }
         public string? Description { get; set; }

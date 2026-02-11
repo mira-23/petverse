@@ -251,9 +251,9 @@ namespace PetVerse.Migrations
                     b.Property<string>("IdentificationNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("Logo")
+                    b.Property<string>("LogoPath")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
