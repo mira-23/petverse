@@ -1,5 +1,3 @@
-using Swashbuckle.AspNetCore.Annotations;
-
 namespace PetVerse.DTOs
 {
     public class CreateBusinessProfileDto
