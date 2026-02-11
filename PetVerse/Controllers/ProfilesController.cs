@@ -79,5 +79,67 @@ namespace PetVerse.Controllers
             };
             return Ok(responseDTO);
         }
+
+        [Authorize]
+        [HttpPost("shelter")]
+        [ProducesResponseType(typeof(CreateShelterProfileDto), StatusCodes.Status201Created)]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult> CreateShelterProfile(CreateShelterProfileDto createShelterProfileDto)
+        {
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            ShelterProfile result;
+
+            try
+            {
+                result = await _profileService.CreateShelterProfileAsync(createShelterProfileDto);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            } 
+            catch (InvalidOperationException e)
+            {
+                return StatusCode(500,e.Message);
+            } 
+
+            if (result == null)
+            {
+                return BadRequest();
+            }
+
+            var responseDTO = new ShelterProfileResponseDTO
+            {
+                Id = result.Id,
+                Address = result.Address,
+                LogoPath = $"{Request.Scheme}://{Request.Host}/Images/Logos/{result.LogoPath}",
+                Name = result.Name,
+                Description = result.Description,
+                IBAN = result.IBAN
+            };
+
+            return CreatedAtAction(nameof(GetShelterById), new { id = responseDTO.Id }, responseDTO);
+        }
+
+        [Authorize]
+        [HttpGet("shelter/{id}")]
+        public async Task<ActionResult<ShelterProfileResponseDTO>> GetShelterById(int id)
+        {
+            var profile = await _profileService.GetShelterByIdAsync(id);
+            if (profile == null) return NotFound();
+            
+            var responseDTO = new ShelterProfileResponseDTO
+            {
+                Id = profile.Id,
+                Address = profile.Address,
+                LogoPath = $"{Request.Scheme}://{Request.Host}/Images/Logos/{profile.LogoPath}",
+                Name = profile.Name,
+                Description = profile.Description,
+                IBAN = profile.IBAN
+            };
+            return Ok(responseDTO);
+        }
     }
 }

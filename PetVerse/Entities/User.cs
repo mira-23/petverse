@@ -12,5 +12,7 @@ namespace PetVerse.Entities
         public Pet? Pet { get; set; }
 
         public virtual ICollection<UserToBusinessProfileMapping>? UserToBusinessProfileMapping {get;set;}
+
+        public virtual ICollection<UserToShelterProfileMapping>? UserToShelterProfileMapping {get;set;}
     }
 }
