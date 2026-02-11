@@ -25,13 +25,8 @@ namespace PetVerse.Controllers
         [AllowAnonymous]
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<RegistratrionResponseDTO>> RegisterUser([FromBody] UserForRegistrationDTO userForRegistrationDTO)
+        public async Task<ActionResult<RegistratrionResponseDTO>> RegisterUser(UserForRegistrationDTO userForRegistrationDTO)
         {
-            if (userForRegistrationDTO == null)
-            {
-                return BadRequest();
-            }
-
             var user = new User
             {
                 UserName = userForRegistrationDTO.UserName,

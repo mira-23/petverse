@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using PetVerse.Data;
@@ -20,6 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
+builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<JwtService>();
 
@@ -40,6 +42,7 @@ builder.Services.AddSwaggerGen(options =>
              );
 
     options.AddSecurityRequirement(document => new() { [new OpenApiSecuritySchemeReference("Bearer", document)] = [] });
+    options.EnableAnnotations();
 });
 
 builder.Services.AddAuthentication(options =>
@@ -73,6 +76,17 @@ using (var scope = app.Services.CreateScope())
     DbInitializer.Initialize(context);
 }
 
+var imagesPath = Path.Combine(builder.Environment.ContentRootPath, "Images");
+if (!Directory.Exists(imagesPath))
+{
+    Directory.CreateDirectory(imagesPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(imagesPath),
+    RequestPath = "/Images"
+});
 
 app.UseSwagger();
 app.UseSwaggerUI();
