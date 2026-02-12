@@ -55,7 +55,7 @@ namespace PetVerse.Services
                 
                 string extension = Path.GetExtension(createBusinessProfileDto.Logo.FileName);
                 string name = Path.GetFileNameWithoutExtension(createBusinessProfileDto.Logo.FileName);
-                string fileName = $"{name}_{businessProfile.Id}{extension}";
+                string fileName = $"{name}_business_{businessProfile.Id}{extension}";
                 string filePath = Path.Combine(path, fileName);
                 using (Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                 {
@@ -148,7 +148,7 @@ namespace PetVerse.Services
                 
                 string extension = Path.GetExtension(createShelterProfileDto.Logo.FileName);
                 string name = Path.GetFileNameWithoutExtension(createShelterProfileDto.Logo.FileName);
-                string fileName = $"{name}_{shelterProfile.Id}{extension}";
+                string fileName = $"{name}_shelter_{shelterProfile.Id}{extension}";
                 string filePath = Path.Combine(path, fileName);
                 using (Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                 {
