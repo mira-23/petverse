@@ -12,6 +12,9 @@ namespace PetVerse.Data
 
         public DbSet<ShelterProfile> ShelterProfiles { get; set; }
 
+        public DbSet<UserToShelterProfileMapping> UserToShelterProfileMapping { get; set; }
+        public DbSet<UserToBusinessProfileMapping> UserToBusinessProfileMapping { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {

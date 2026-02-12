@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using PetVerse.Data;
 using PetVerse.DTOs;
@@ -15,7 +16,7 @@ namespace PetVerse.Services
             _context = context;
         }
 
-        public async Task<BusinessProfile> CreateBusinessProfileAsync(CreateBusinessProfileDto createBusinessProfileDto)
+        public async Task<BusinessProfile> CreateBusinessProfileAsync(string userId, CreateBusinessProfileDto createBusinessProfileDto)
         {
 
             var errors = new List<string>();
@@ -65,6 +66,16 @@ namespace PetVerse.Services
                 businessProfile.LogoPath = fileName;
 
                 await _context.SaveChangesAsync();
+
+                var userBusinessMapping = new UserToBusinessProfileMapping
+                {
+                    UserId = userId,
+                    BusinessProfileId = businessProfile.Id
+                };
+
+                _context.UserToBusinessProfileMapping.Add(userBusinessMapping);
+                await _context.SaveChangesAsync();
+
                 await transaction.CommitAsync();
                 return businessProfile;
             }
@@ -95,7 +106,7 @@ namespace PetVerse.Services
             return await _context.BusinessProfiles.FindAsync(id);
         }
 
-        public async Task<ShelterProfile> CreateShelterProfileAsync(CreateShelterProfileDto createShelterProfileDto)
+        public async Task<ShelterProfile> CreateShelterProfileAsync(string userId, CreateShelterProfileDto createShelterProfileDto)
         {
 
             var errors = new List<string>();
@@ -148,6 +159,16 @@ namespace PetVerse.Services
                 shelterProfile.LogoPath = fileName;
 
                 await _context.SaveChangesAsync();
+                
+                var userShelterMapping = new UserToShelterProfileMapping
+                {
+                    UserId = userId,
+                    ShelterProfileId = shelterProfile.Id
+                };
+
+                _context.UserToShelterProfileMapping.Add(userShelterMapping);
+                await _context.SaveChangesAsync();
+
                 await transaction.CommitAsync();
                 return shelterProfile;
             }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PetVerse.DTOs;
@@ -30,9 +31,16 @@ namespace PetVerse.Controllers
 
             BusinessProfile result;
 
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
             try
             {
-                result = await _profileService.CreateBusinessProfileAsync(createBusinessProfileDto);
+                result = await _profileService.CreateBusinessProfileAsync(userId,createBusinessProfileDto);
             }
             catch (ValidationException e)
             {
@@ -91,10 +99,16 @@ namespace PetVerse.Controllers
                 return BadRequest(ModelState);
 
             ShelterProfile result;
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
 
             try
             {
-                result = await _profileService.CreateShelterProfileAsync(createShelterProfileDto);
+                result = await _profileService.CreateShelterProfileAsync(userId,createShelterProfileDto);
             }
             catch (ValidationException e)
             {
