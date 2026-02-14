@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PetVerse.Data;
 using PetVerse.DTOs;
@@ -78,8 +79,13 @@ namespace PetVerse.Services
                 await transaction.CommitAsync();
                 return businessProfile;
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
+                {
+                    throw new ValidationException("Business profile name already exists!");
+                }
+
                 await transaction.RollbackAsync();
                 throw new InvalidOperationException("Database error while creating business profile");
             }
@@ -171,8 +177,13 @@ namespace PetVerse.Services
                 await transaction.CommitAsync();
                 return shelterProfile;
             }
-            catch (DbUpdateException)
+             catch (DbUpdateException ex)
             {
+                if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
+                {
+                    throw new ValidationException("Shelter profile name already exists!");
+                }
+
                 await transaction.RollbackAsync();
                 throw new InvalidOperationException("Database error while creating shelter profile");
             }

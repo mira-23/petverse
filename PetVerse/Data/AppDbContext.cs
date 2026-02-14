@@ -58,6 +58,16 @@ namespace PetVerse.Data
                 .WithMany(b => b.UserToShelterProfileMapping)
                 .HasForeignKey(e => e.ShelterProfileId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Unique names for profiles
+
+            builder.Entity<ShelterProfile>()
+                .HasIndex(s => s.Name)
+                .IsUnique();
+
+            builder.Entity<BusinessProfile>()
+                .HasIndex(b => b.Name)
+                .IsUnique();
         
         }
 
