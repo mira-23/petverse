@@ -1,6 +1,6 @@
 namespace PetVerse.DTOs
 {
-    public class CreateBusinessProfileDto
+    public class CreateShelterProfileDto
     {
         public required string Address { get; set; }
 
@@ -9,6 +9,6 @@ namespace PetVerse.DTOs
         public required string Name { get; set; }
         public string? Description { get; set; }
 
-        public string? IdentificationNumber { get; set; }
+        public required string IBAN { get; set; }
     }
 }

@@ -10,6 +10,11 @@ namespace PetVerse.Data
         public DbSet<Post> Posts { get; set; }
         public DbSet<BusinessProfile> BusinessProfiles { get; set; }
 
+        public DbSet<ShelterProfile> ShelterProfiles { get; set; }
+
+        public DbSet<UserToShelterProfileMapping> UserToShelterProfileMapping { get; set; }
+        public DbSet<UserToBusinessProfileMapping> UserToBusinessProfileMapping { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
@@ -22,6 +27,7 @@ namespace PetVerse.Data
         {
             base.OnModelCreating(builder);
 
+            // Buisness Profile Mapping
             builder.Entity<UserToBusinessProfileMapping>()
                 .HasKey(e => new { e.UserId, e.BusinessProfileId });
             
@@ -36,6 +42,33 @@ namespace PetVerse.Data
                 .WithMany(b => b.UserToBusinessProfileMapping)
                 .HasForeignKey(e => e.BusinessProfileId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Shelter Profile Mapping
+            builder.Entity<UserToShelterProfileMapping>()
+                .HasKey(e => new { e.UserId, e.ShelterProfileId });
+            
+            builder.Entity<UserToShelterProfileMapping>()
+                .HasOne(e => e.User)
+                .WithMany(u => u.UserToShelterProfileMapping)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            builder.Entity<UserToShelterProfileMapping>()
+                .HasOne(e => e.ShelterProfile)
+                .WithMany(b => b.UserToShelterProfileMapping)
+                .HasForeignKey(e => e.ShelterProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Unique names for profiles
+
+            builder.Entity<ShelterProfile>()
+                .HasIndex(s => s.Name)
+                .IsUnique();
+
+            builder.Entity<BusinessProfile>()
+                .HasIndex(b => b.Name)
+                .IsUnique();
+        
         }
 
 

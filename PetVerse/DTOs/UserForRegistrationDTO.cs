@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
-using PetVerse.Models;
 
 namespace PetVerse.DTOs
 {
