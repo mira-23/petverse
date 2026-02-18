@@ -18,6 +18,7 @@ namespace PetVerse.Services
 
         public async Task<LostAnimalPost> CreateLostAnimalPostAsync(string userId, CreateLostAnimalPostDTO dto)
         {
+            List<string> animalTypes = ["cat","dog","other"];
             var errors = new List<string>();
         
             if (string.IsNullOrEmpty(dto.Title) || string.IsNullOrWhiteSpace(dto.Title))
@@ -39,6 +40,9 @@ namespace PetVerse.Services
 
             if (string.IsNullOrEmpty(dto.Type) || string.IsNullOrWhiteSpace(dto.Type))
                 errors.Add("Animal type is required");
+
+            if (!animalTypes.Contains(dto.Type))
+                errors.Add("Animal type must be cat|dog|other");
             
             if (errors.Any())
                 throw new ValidationException(string.Join(", ", errors));
