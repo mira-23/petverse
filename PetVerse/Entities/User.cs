@@ -10,6 +10,7 @@ namespace PetVerse.Entities
         public required string LastName { get; set; }
 
         public Pet? Pet { get; set; }
+        public ICollection<LostAnimalPost>? LostAnimalPosts {get;set;}
 
         public virtual ICollection<UserToBusinessProfileMapping>? UserToBusinessProfileMapping {get;set;}
 

@@ -11,14 +11,6 @@ public static class DbInitializer
     {
         context.Database.Migrate();
 
-        if (!context.Posts.Any())
-        {
-            context.Posts.AddRange(
-                new Post { Title = "Post", Content = "Hello, this is a post" },
-                new Post { Title = "Test", Content = "Test test test" }
-            );
-        }
-
         if (!context.Users.Any())
         {
             var admin = new User

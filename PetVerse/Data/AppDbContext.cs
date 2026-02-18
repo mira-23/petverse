@@ -7,13 +7,14 @@ namespace PetVerse.Data
 {
     public class AppDbContext : IdentityDbContext<User>
     {
-        public DbSet<Post> Posts { get; set; }
         public DbSet<BusinessProfile> BusinessProfiles { get; set; }
 
         public DbSet<ShelterProfile> ShelterProfiles { get; set; }
 
         public DbSet<UserToShelterProfileMapping> UserToShelterProfileMapping { get; set; }
         public DbSet<UserToBusinessProfileMapping> UserToBusinessProfileMapping { get; set; }
+
+        public DbSet<LostAnimalPost> LostAnimalPosts { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
