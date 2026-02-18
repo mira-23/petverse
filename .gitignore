@@ -7,7 +7,7 @@
 **/PetVerse.AssemblyInfo.cs
 bin/
 obj/
-PetVerse/Images/Logos/
+PetVerse/Images/
 
 # User-specific files
 *.rsuser
