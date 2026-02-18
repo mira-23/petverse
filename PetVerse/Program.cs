@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -7,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using PetVerse.Data;
 using PetVerse.Entities;
+using PetVerse.Policies.Handlers;
+using PetVerse.Policies.Requirements;
 using PetVerse.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +27,7 @@ builder.Services.AddIdentity<User, IdentityRole>()
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IAuthorizationHandler, ProfileTypeHanlder>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -65,7 +69,14 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IsUser", policy =>
+        policy.Requirements.Add(new ProfileTypeRequirement(ProfileType.User)));
+});
+
 
 var app = builder.Build();
 
