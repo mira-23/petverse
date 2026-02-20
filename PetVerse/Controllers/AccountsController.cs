@@ -27,6 +27,11 @@ namespace PetVerse.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<RegistratrionResponseDTO>> RegisterUser(UserForRegistrationDTO userForRegistrationDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var user = new User
             {
                 UserName = userForRegistrationDTO.UserName,
@@ -65,6 +70,11 @@ namespace PetVerse.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserLoginResponseDTO>> Login(UserLoginRequestDTO request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var result = await _jwtService.Authenticate(request);
             if (result is null)
                 return Unauthorized();
@@ -76,6 +86,11 @@ namespace PetVerse.Controllers
         [HttpGet("verify-username")]
         public async Task<IActionResult> VerifyUserName([FromQuery] string userName)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            
             var user = await _userManager.FindByNameAsync(userName);
 
             return Ok(new { exists = user != null });

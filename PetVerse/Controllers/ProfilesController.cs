@@ -25,7 +25,6 @@ namespace PetVerse.Controllers
         [Consumes("multipart/form-data")]
         public async Task<ActionResult> CreateBusinessProfile(CreateBusinessProfileDto createBusinessProfileDto)
         {
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -73,6 +72,12 @@ namespace PetVerse.Controllers
         [HttpGet("business/{id}")]
         public async Task<ActionResult<BusinessProfileResponseDTO>> GetBusinessById(int id)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var profile = await _profileService.GetBusinessByIdAsync(id);
             if (profile == null) return NotFound();
             
@@ -141,6 +146,12 @@ namespace PetVerse.Controllers
         [HttpGet("shelter/{id}")]
         public async Task<ActionResult<ShelterProfileResponseDTO>> GetShelterById(int id)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var profile = await _profileService.GetShelterByIdAsync(id);
             if (profile == null) return NotFound();
             

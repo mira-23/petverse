@@ -25,6 +25,11 @@ namespace PetVerse.Controllers
         [HttpPost("user/lost_animal")]
         public async Task<IActionResult> CreateLostAnimalPost(CreateLostAnimalPostDTO dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var authorizationResult = await _authorizationService.AuthorizeAsync(
             User,
             dto,
@@ -35,17 +40,14 @@ namespace PetVerse.Controllers
                 return Forbid();
             }
             
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            LostAnimalPost result;
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized();
             }
-
+            
+            LostAnimalPost result;
             try
             {
                 result = await _postService.CreateLostAnimalPostAsync(userId,dto);
@@ -81,6 +83,10 @@ namespace PetVerse.Controllers
         [HttpGet("user/lost_animal/{id}")]
         public async Task<ActionResult<LostAnimalPostRepsonseDTO>> GetLostAnimalPostById(int id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
             var post = await _postService.GetLostAnimalPostByIdAsync(id);
             if (post == null) return NotFound();
             
