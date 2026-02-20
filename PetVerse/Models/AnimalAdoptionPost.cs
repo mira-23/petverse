@@ -1,8 +1,7 @@
 namespace PetVerse.Models
 {
-    public class AnimalAdoptionPost : Post
+    public class AnimalAdoptionPost : PhotoPost
     {
-        public required string PhotoPath { get; set; }
         public required string Type { get; set; }
         public int ShelterProfileId { get; set; }
         public required string UserId { get; set; }
