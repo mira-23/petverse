@@ -10,7 +10,7 @@ namespace PetVerse.DTOs
         public required string Body { get; set; }
         [Description("Must be either 'cat', 'dog' or 'other'")]
         public required string Type { get; set; }
-        public required string ShelterId { get; set; }
+        public int ShelterId { get; set; }
         public required string UserId { get; set; }
         public required DateTime Published { get; set; }
         public DateTime? AdoptedAt { get; set; }
