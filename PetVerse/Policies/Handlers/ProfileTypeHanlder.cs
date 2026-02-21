@@ -5,7 +5,6 @@ using PetVerse.Services;
 using PetVerse.Data;
 using Microsoft.EntityFrameworkCore;
 using PetVerse.DTOs;
-using PetVerse.Entities;
 
 namespace PetVerse.Policies.Handlers;
 
@@ -26,19 +25,33 @@ public class ProfileTypeHanlder : AuthorizationHandler<ProfileTypeRequirement>
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context, ProfileTypeRequirement requirement)
     {
-        string userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        string? userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (userId is null)
         {
             return;
         }
 
-        if (requirement.ProfileType==ProfileType.User && context.Resource is CreateLostAnimalPostDTO)
+        if (requirement.ProfileType == ProfileType.User && context.Resource is CreateLostAnimalPostDTO)
         {
             context.Succeed(requirement);
             return;
         }
-        
+
+        if (requirement.ProfileType == ProfileType.Shelter && context.Resource is CreateAnimalAdoptionPostDTO dto)
+        {
+            var profile = await _profileService.GetShelterByIdAsync(dto.ShelterId);
+            if (profile != null)
+            {
+                bool doesUserOwnProfile = await _context.UserToShelterProfileMapping.AnyAsync(ub =>
+                ub.ShelterProfileId == profile.Id && ub.UserId == userId);
+                if (doesUserOwnProfile)
+                {
+                    context.Succeed(requirement);
+                    return;
+                }
+            }
+        }
 
         return;
     }

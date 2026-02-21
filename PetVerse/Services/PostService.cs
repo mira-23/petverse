@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PetVerse.Data;
 using PetVerse.DTOs;
@@ -122,7 +121,7 @@ namespace PetVerse.Services
             return await _context.LostAnimalPosts.FindAsync(id);
         }
 
-        public async Task<AnimalAdoptionPost> CreateLostAnimalPostAsync(string userId, CreateAnimalAdoptionPostDTO dto)
+        public async Task<AnimalAdoptionPost> CreateAnimalAdoptionPostAsync(string userId, CreateAnimalAdoptionPostDTO dto)
         {
             ValidateData(dto);
 

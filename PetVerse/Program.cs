@@ -75,6 +75,9 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("IsUser", policy =>
         policy.Requirements.Add(new ProfileTypeRequirement(ProfileType.User)));
+
+    options.AddPolicy("IsShelter", policy =>
+        policy.Requirements.Add(new ProfileTypeRequirement(ProfileType.Shelter)));
 });
 
 
