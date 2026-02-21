@@ -16,78 +16,61 @@ namespace PetVerse.Services
             _context = context;
         }
 
-        public async Task<BusinessProfile> CreateBusinessProfileAsync(string userId, CreateBusinessProfileDto createBusinessProfileDto)
+        private static void ValidateData(CreateProfileDto dto)
         {
-
             var errors = new List<string>();
-        
-            if (string.IsNullOrEmpty(createBusinessProfileDto.Name) || string.IsNullOrWhiteSpace(createBusinessProfileDto.Name))
+
+            if (string.IsNullOrEmpty(dto.Name) || string.IsNullOrWhiteSpace(dto.Name))
                 errors.Add("Name is required");
-            
-            if (string.IsNullOrEmpty(createBusinessProfileDto.Address) || string.IsNullOrWhiteSpace(createBusinessProfileDto.Address))
+
+            if (string.IsNullOrEmpty(dto.Address) || string.IsNullOrWhiteSpace(dto.Address))
                 errors.Add("Address is required");
 
-            if (createBusinessProfileDto.Logo == null 
-            || createBusinessProfileDto.Logo.Name == null 
-            || createBusinessProfileDto.Logo.FileName == null
-            || createBusinessProfileDto.Logo.Length==0)
+            if (dto.Logo == null
+            || dto.Logo.Name == null
+            || dto.Logo.FileName == null
+            || dto.Logo.Length == 0)
                 errors.Add("Logo is required");
-            
+
             if (errors.Any())
                 throw new ValidationException(string.Join(", ", errors));
+        }
 
-            var businessProfile = new BusinessProfile
-                {
-                    Address = createBusinessProfileDto.Address,
-                    LogoPath = "",
-                    Name = createBusinessProfileDto.Name,
-                    Description = createBusinessProfileDto.Description,
-                    IdentificationNumber = createBusinessProfileDto.IdentificationNumber
-                };
-                
+        private async Task SaveToDbAsync(Profile profile, CreateProfileDto dto, string profileType)
+        {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                _context.BusinessProfiles.Add(businessProfile);
+                _context.Add(profile);
                 await _context.SaveChangesAsync();
 
-                string path = Path.Combine(Environment.CurrentDirectory, "Images","Logos");
+                string path = Path.Combine(Environment.CurrentDirectory, "Images", "Logos");
                 Directory.CreateDirectory(path);
-                
-                string extension = Path.GetExtension(createBusinessProfileDto.Logo.FileName);
-                string name = Path.GetFileNameWithoutExtension(createBusinessProfileDto.Logo.FileName);
-                string fileName = $"{name}_business_{businessProfile.Id}{extension}";
+
+                string? extension = Path.GetExtension(dto.Logo?.FileName);
+                string? name = Path.GetFileNameWithoutExtension(dto.Logo?.FileName);
+                string fileName = $"{name}_{profileType}_{profile.Id}{extension}";
                 string filePath = Path.Combine(path, fileName);
                 using (Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                 {
-                    createBusinessProfileDto.Logo.CopyTo(fileStream);
+                    dto.Logo?.CopyTo(fileStream);
                 }
 
-                businessProfile.LogoPath = fileName;
+                profile.LogoPath = fileName;
 
-                await _context.SaveChangesAsync();
-
-                var userBusinessMapping = new UserToBusinessProfileMapping
-                {
-                    UserId = userId,
-                    BusinessProfileId = businessProfile.Id
-                };
-
-                _context.UserToBusinessProfileMapping.Add(userBusinessMapping);
                 await _context.SaveChangesAsync();
 
                 await transaction.CommitAsync();
-                return businessProfile;
             }
             catch (DbUpdateException ex)
             {
                 if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
                 {
-                    throw new ValidationException("Business profile name already exists!");
+                    throw new ValidationException($"{profileType} profile name already exists!");
                 }
 
                 await transaction.RollbackAsync();
-                throw new InvalidOperationException("Database error while creating business profile");
+                throw new InvalidOperationException($"Database error while creating {profileType} profile");
             }
             catch (IOException)
             {
@@ -102,8 +85,36 @@ namespace PetVerse.Services
             catch (Exception e)
             {
                 await transaction.RollbackAsync();
-                throw new InvalidOperationException($"An error occurred while creating the business profile: {e.Message}");
+                throw new InvalidOperationException($"An error occurred while creating the {profileType} profile: {e.Message}");
             }
+        }
+
+        public async Task<BusinessProfile> CreateBusinessProfileAsync(string userId, CreateBusinessProfileDto createBusinessProfileDto)
+        {
+
+            ValidateData(createBusinessProfileDto);
+
+            var businessProfile = new BusinessProfile
+            {
+                Address = createBusinessProfileDto.Address,
+                LogoPath = "",
+                Name = createBusinessProfileDto.Name,
+                Description = createBusinessProfileDto.Description,
+                IdentificationNumber = createBusinessProfileDto.IdentificationNumber
+            };
+
+            await SaveToDbAsync(businessProfile, createBusinessProfileDto, "business");
+
+            var userBusinessMapping = new UserToBusinessProfileMapping
+            {
+                UserId = userId,
+                BusinessProfileId = businessProfile.Id
+            };
+
+            _context.UserToBusinessProfileMapping.Add(userBusinessMapping);
+            await _context.SaveChangesAsync();
+
+            return businessProfile;
         }
 
         internal async Task<BusinessProfile?> GetBusinessByIdAsync(int id)
@@ -114,94 +125,32 @@ namespace PetVerse.Services
         public async Task<ShelterProfile> CreateShelterProfileAsync(string userId, CreateShelterProfileDto createShelterProfileDto)
         {
 
-            var errors = new List<string>();
-        
-            if (string.IsNullOrEmpty(createShelterProfileDto.Name) || string.IsNullOrWhiteSpace(createShelterProfileDto.Name))
-                errors.Add("Name is required");
-            
-            if (string.IsNullOrEmpty(createShelterProfileDto.Address) || string.IsNullOrWhiteSpace(createShelterProfileDto.Address))
-                errors.Add("Address is required");
-
-            if (createShelterProfileDto.Logo == null 
-            || createShelterProfileDto.Logo.Name == null 
-            || createShelterProfileDto.Logo.FileName == null
-            || createShelterProfileDto.Logo.Length==0)
-                errors.Add("Logo is required");
+            ValidateData(createShelterProfileDto);
 
             if (string.IsNullOrEmpty(createShelterProfileDto.IBAN) || string.IsNullOrWhiteSpace(createShelterProfileDto.IBAN))
-                errors.Add("IBAN is required");
-            
-            if (errors.Any())
-                throw new ValidationException(string.Join(", ", errors));
+                throw new ValidationException("IBAN is required");
 
             var shelterProfile = new ShelterProfile
-                {
-                    Address = createShelterProfileDto.Address,
-                    LogoPath = "",
-                    Name = createShelterProfileDto.Name,
-                    Description = createShelterProfileDto.Description,
-                    IBAN = createShelterProfileDto.IBAN
-                };
-                
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
             {
-                _context.ShelterProfiles.Add(shelterProfile);
-                await _context.SaveChangesAsync();
+                Address = createShelterProfileDto.Address,
+                LogoPath = "",
+                Name = createShelterProfileDto.Name,
+                Description = createShelterProfileDto.Description,
+                IBAN = createShelterProfileDto.IBAN
+            };
 
-                string path = Path.Combine(Environment.CurrentDirectory, "Images","Logos");
-                Directory.CreateDirectory(path);
-                
-                string extension = Path.GetExtension(createShelterProfileDto.Logo.FileName);
-                string name = Path.GetFileNameWithoutExtension(createShelterProfileDto.Logo.FileName);
-                string fileName = $"{name}_shelter_{shelterProfile.Id}{extension}";
-                string filePath = Path.Combine(path, fileName);
-                using (Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-                {
-                    createShelterProfileDto.Logo.CopyTo(fileStream);
-                }
+            await SaveToDbAsync(shelterProfile, createShelterProfileDto, "shelter");
 
-                shelterProfile.LogoPath = fileName;
-
-                await _context.SaveChangesAsync();
-                
-                var userShelterMapping = new UserToShelterProfileMapping
-                {
-                    UserId = userId,
-                    ShelterProfileId = shelterProfile.Id
-                };
-
-                _context.UserToShelterProfileMapping.Add(userShelterMapping);
-                await _context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-                return shelterProfile;
-            }
-             catch (DbUpdateException ex)
+            var userShelterMapping = new UserToShelterProfileMapping
             {
-                if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
-                {
-                    throw new ValidationException("Shelter profile name already exists!");
-                }
+                UserId = userId,
+                ShelterProfileId = shelterProfile.Id
+            };
 
-                await transaction.RollbackAsync();
-                throw new InvalidOperationException("Database error while creating shelter profile");
-            }
-            catch (IOException)
-            {
-                await transaction.RollbackAsync();
-                throw new InvalidOperationException("Error saving logo file to disk");
-            }
-            catch (ArgumentException)
-            {
-                await transaction.RollbackAsync();
-                throw new ValidationException("Invalid file path (name possibly has invalid characters)");
-            }
-            catch (Exception e)
-            {
-                await transaction.RollbackAsync();
-                throw new InvalidOperationException($"An error occurred while creating the shelter profile: {e.Message}");
-            }
+            _context.UserToShelterProfileMapping.Add(userShelterMapping);
+            await _context.SaveChangesAsync();
+
+            return shelterProfile;
         }
 
         internal async Task<ShelterProfile?> GetShelterByIdAsync(int id)

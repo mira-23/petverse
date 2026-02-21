@@ -15,7 +15,7 @@ namespace PetVerse.Services
             _context = context;
         }
 
-        private void ValidateData(CreateTypedPostDTO dto)
+        private static void ValidateData(CreateTypedPostDTO dto)
         {
             List<string> animalTypes = ["cat", "dog", "other"];
             var errors = new List<string>();
