@@ -16,13 +16,15 @@ namespace PetVerse.Data
 
         public DbSet<LostAnimalPost> LostAnimalPosts { get; set; }
 
+        public DbSet<AnimalAdoptionPost> AnimalAdoptionPosts { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
 
-             
+
         }
-        
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -31,13 +33,13 @@ namespace PetVerse.Data
             // Buisness Profile Mapping
             builder.Entity<UserToBusinessProfileMapping>()
                 .HasKey(e => new { e.UserId, e.BusinessProfileId });
-            
+
             builder.Entity<UserToBusinessProfileMapping>()
                 .HasOne(e => e.User)
                 .WithMany(u => u.UserToBusinessProfileMapping)
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
             builder.Entity<UserToBusinessProfileMapping>()
                 .HasOne(e => e.BusinessProfile)
                 .WithMany(b => b.UserToBusinessProfileMapping)
@@ -47,13 +49,13 @@ namespace PetVerse.Data
             // Shelter Profile Mapping
             builder.Entity<UserToShelterProfileMapping>()
                 .HasKey(e => new { e.UserId, e.ShelterProfileId });
-            
+
             builder.Entity<UserToShelterProfileMapping>()
                 .HasOne(e => e.User)
                 .WithMany(u => u.UserToShelterProfileMapping)
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
             builder.Entity<UserToShelterProfileMapping>()
                 .HasOne(e => e.ShelterProfile)
                 .WithMany(b => b.UserToShelterProfileMapping)
@@ -69,7 +71,7 @@ namespace PetVerse.Data
             builder.Entity<BusinessProfile>()
                 .HasIndex(b => b.Name)
                 .IsUnique();
-        
+
         }
 
 

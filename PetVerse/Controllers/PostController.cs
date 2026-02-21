@@ -16,7 +16,7 @@ namespace PetVerse.Controllers
 
         private readonly IAuthorizationService _authorizationService;
 
-        public PostsController(PostService postService,IAuthorizationService authorizationService)
+        public PostsController(PostService postService, IAuthorizationService authorizationService)
         {
             _postService = postService;
             _authorizationService = authorizationService;
@@ -25,39 +25,41 @@ namespace PetVerse.Controllers
         [HttpPost("user/lost_animal")]
         public async Task<IActionResult> CreateLostAnimalPost(CreateLostAnimalPostDTO dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var authorizationResult = await _authorizationService.AuthorizeAsync(
             User,
             dto,
             "IsUser");
-        
+
             if (!authorizationResult.Succeeded)
             {
                 return Forbid();
             }
-            
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
-            LostAnimalPost result;
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized();
             }
 
+            LostAnimalPost result;
             try
             {
-                result = await _postService.CreateLostAnimalPostAsync(userId,dto);
+                result = await _postService.CreateLostAnimalPostAsync(userId, dto);
             }
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
-            } 
+            }
             catch (InvalidOperationException e)
             {
-                return StatusCode(500,e.Message);
-            } 
+                return StatusCode(500, e.Message);
+            }
 
             if (result == null)
             {
@@ -81,9 +83,13 @@ namespace PetVerse.Controllers
         [HttpGet("user/lost_animal/{id}")]
         public async Task<ActionResult<LostAnimalPostRepsonseDTO>> GetLostAnimalPostById(int id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
             var post = await _postService.GetLostAnimalPostByIdAsync(id);
             if (post == null) return NotFound();
-            
+
             var responseDTO = new LostAnimalPostRepsonseDTO
             {
                 Id = post.Id,
@@ -92,6 +98,91 @@ namespace PetVerse.Controllers
                 Type = post.Type,
                 Body = post.Body,
                 UserId = post.UserId,
+                Status = post.Status
+            };
+            return Ok(responseDTO);
+        }
+
+        [HttpPost("shelter/animal_adoption")]
+        public async Task<IActionResult> CreateAnimalAdoptionPost(CreateAnimalAdoptionPostDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(
+            User,
+            dto,
+            "IsShelter");
+
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            AnimalAdoptionPost result;
+            try
+            {
+                result = await _postService.CreateAnimalAdoptionPostAsync(userId, dto);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (InvalidOperationException e)
+            {
+                return StatusCode(500, e.Message);
+            }
+
+            if (result == null)
+            {
+                return BadRequest();
+            }
+
+            var responseDTO = new AnimalAdoptionPostRepsonseDTO
+            {
+                PhotoPath = $"{Request.Scheme}://{Request.Host}/Images/AnimalAdoptions/{result.PhotoPath}",
+                Title = result.Title,
+                Type = result.Type,
+                Body = result.Body,
+                ShelterId = result.ShelterProfileId,
+                UserId = result.UserId,
+                Published = result.Published,
+                AdoptedAt = result.AdoptedAt,
+                Status = result.Status
+            };
+
+            return CreatedAtAction(nameof(GetAnimalAdoptionPostById), new { id = result.Id }, responseDTO);
+        }
+
+        [HttpGet("shelter/animal_adoption/{id}")]
+        public async Task<ActionResult<AnimalAdoptionPostRepsonseDTO>> GetAnimalAdoptionPostById(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var post = await _postService.GetAnimalAdoptionPostByIdAsync(id);
+            if (post == null) return NotFound();
+
+            var responseDTO = new AnimalAdoptionPostRepsonseDTO
+            {
+                PhotoPath = $"{Request.Scheme}://{Request.Host}/Images/AnimalAdoptions/{post.PhotoPath}",
+                Title = post.Title,
+                Type = post.Type,
+                Body = post.Body,
+                ShelterId = post.ShelterProfileId,
+                UserId = post.UserId,
+                Published = post.Published,
+                AdoptedAt = post.AdoptedAt,
                 Status = post.Status
             };
             return Ok(responseDTO);

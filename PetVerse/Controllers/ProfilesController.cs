@@ -25,13 +25,12 @@ namespace PetVerse.Controllers
         [Consumes("multipart/form-data")]
         public async Task<ActionResult> CreateBusinessProfile(CreateBusinessProfileDto createBusinessProfileDto)
         {
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             BusinessProfile result;
 
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -40,16 +39,16 @@ namespace PetVerse.Controllers
 
             try
             {
-                result = await _profileService.CreateBusinessProfileAsync(userId,createBusinessProfileDto);
+                result = await _profileService.CreateBusinessProfileAsync(userId, createBusinessProfileDto);
             }
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
-            } 
+            }
             catch (InvalidOperationException e)
             {
-                return StatusCode(500,e.Message);
-            } 
+                return StatusCode(500, e.Message);
+            }
 
             if (result == null)
             {
@@ -73,9 +72,15 @@ namespace PetVerse.Controllers
         [HttpGet("business/{id}")]
         public async Task<ActionResult<BusinessProfileResponseDTO>> GetBusinessById(int id)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var profile = await _profileService.GetBusinessByIdAsync(id);
             if (profile == null) return NotFound();
-            
+
             var responseDTO = new BusinessProfileResponseDTO
             {
                 Id = profile.Id,
@@ -99,7 +104,7 @@ namespace PetVerse.Controllers
                 return BadRequest(ModelState);
 
             ShelterProfile result;
-            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -108,16 +113,16 @@ namespace PetVerse.Controllers
 
             try
             {
-                result = await _profileService.CreateShelterProfileAsync(userId,createShelterProfileDto);
+                result = await _profileService.CreateShelterProfileAsync(userId, createShelterProfileDto);
             }
             catch (ValidationException e)
             {
                 return BadRequest(e.Message);
-            } 
+            }
             catch (InvalidOperationException e)
             {
-                return StatusCode(500,e.Message);
-            } 
+                return StatusCode(500, e.Message);
+            }
 
             if (result == null)
             {
@@ -141,9 +146,15 @@ namespace PetVerse.Controllers
         [HttpGet("shelter/{id}")]
         public async Task<ActionResult<ShelterProfileResponseDTO>> GetShelterById(int id)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var profile = await _profileService.GetShelterByIdAsync(id);
             if (profile == null) return NotFound();
-            
+
             var responseDTO = new ShelterProfileResponseDTO
             {
                 Id = profile.Id,

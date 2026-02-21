@@ -21,6 +21,12 @@ namespace PetVerse.Controllers
         [HttpGet("get_user")]
         public async Task<IActionResult> GetUser()
         {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (userId == null)
