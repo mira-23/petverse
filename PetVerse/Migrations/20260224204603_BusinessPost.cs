@@ -41,7 +41,7 @@ namespace PetVerse.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Path = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BusinessPostId = table.Column<int>(type: "int", nullable: true)
+                    BusinessPostId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -50,7 +50,8 @@ namespace PetVerse.Migrations
                         name: "FK_PostMedias_BusinessPosts_BusinessPostId",
                         column: x => x.BusinessPostId,
                         principalTable: "BusinessPosts",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

@@ -12,7 +12,7 @@ using PetVerse.Data;
 namespace PetVerse.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260224190603_BusinessPost")]
+    [Migration("20260224204603_BusinessPost")]
     partial class BusinessPost
     {
         /// <inheritdoc />
@@ -421,7 +421,7 @@ namespace PetVerse.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BusinessPostId")
+                    b.Property<int>("BusinessPostId")
                         .HasColumnType("int");
 
                     b.Property<string>("Path")
@@ -591,7 +591,9 @@ namespace PetVerse.Migrations
                 {
                     b.HasOne("PetVerse.Models.BusinessPost", null)
                         .WithMany("PostMedias")
-                        .HasForeignKey("BusinessPostId");
+                        .HasForeignKey("BusinessPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PetVerse.Models.UserToBusinessProfileMapping", b =>

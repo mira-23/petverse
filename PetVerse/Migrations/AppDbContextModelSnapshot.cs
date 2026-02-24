@@ -418,7 +418,7 @@ namespace PetVerse.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("BusinessPostId")
+                    b.Property<int>("BusinessPostId")
                         .HasColumnType("int");
 
                     b.Property<string>("Path")
@@ -588,7 +588,9 @@ namespace PetVerse.Migrations
                 {
                     b.HasOne("PetVerse.Models.BusinessPost", null)
                         .WithMany("PostMedias")
-                        .HasForeignKey("BusinessPostId");
+                        .HasForeignKey("BusinessPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PetVerse.Models.UserToBusinessProfileMapping", b =>
