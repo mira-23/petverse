@@ -18,6 +18,10 @@ namespace PetVerse.Data
 
         public DbSet<AnimalAdoptionPost> AnimalAdoptionPosts { get; set; }
 
+        public DbSet<BusinessPost> BusinessPosts { get; set; }
+
+        public DbSet<PostMedia> PostMedias { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
