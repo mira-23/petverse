@@ -187,6 +187,86 @@ namespace PetVerse.Controllers
             };
             return Ok(responseDTO);
         }
+
+        [HttpPost("business/business_post")]
+        public async Task<IActionResult> CreateBusinessPost(CreateBusinessPostDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(
+            User,
+            dto,
+            "IsBusiness");
+
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            BusinessPost result;
+            try
+            {
+                result = await _postService.CreateBusinessPostAsync(userId, dto);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (InvalidOperationException e)
+            {
+                return StatusCode(500, e.Message);
+            }
+
+            if (result == null)
+            {
+                return BadRequest();
+            }
+
+            var responseDTO = new BusinessPostRepsonseDTO
+            {
+                BusinessId = result.BusinessProfileId,
+                MediaPaths = [.. result.PostMedias.Select(x=>$"{Request.Scheme}://{Request.Host}/Images/Businesss/{x.Path}")],
+                Title = result.Title,
+                Body = result.Body,
+                UserId = result.UserId,
+                Published = result.Published
+            };
+
+            return CreatedAtAction(nameof(GetBusinessPostById), new { id = result.Id }, responseDTO);
+        }
+
+        [HttpGet("business/business_post/{id}")]
+        public async Task<ActionResult<BusinessPostRepsonseDTO>> GetBusinessPostById(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            var post = await _postService.GetBusinessPostByIdAsync(id);
+            if (post == null) return NotFound();
+
+            var responseDTO = new BusinessPostRepsonseDTO
+            {
+                BusinessId = post.BusinessProfileId,
+                MediaPaths = [.. post.PostMedias.Select(x=>$"{Request.Scheme}://{Request.Host}/Images/Businesss/{x.Path}")],
+                Title = post.Title,
+                Body = post.Body,
+                UserId = post.UserId,
+                Published = post.Published
+            };
+
+            return Ok(responseDTO);
+        }
     }
 }
 

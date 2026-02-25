@@ -53,6 +53,21 @@ public class ProfileTypeHanlder : AuthorizationHandler<ProfileTypeRequirement>
             }
         }
 
+        if (requirement.ProfileType == ProfileType.Business && context.Resource is CreateBusinessPostDTO bdto)
+        {
+            var profile = await _profileService.GetBusinessByIdAsync(bdto.BusinessId);
+            if (profile != null)
+            {
+                bool doesUserOwnProfile = await _context.UserToBusinessProfileMapping.AnyAsync(ub =>
+                ub.BusinessProfileId == profile.Id && ub.UserId == userId);
+                if (doesUserOwnProfile)
+                {
+                    context.Succeed(requirement);
+                    return;
+                }
+            }
+        }
+
         return;
     }
 }

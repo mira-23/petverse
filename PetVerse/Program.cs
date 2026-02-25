@@ -78,6 +78,9 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("IsShelter", policy =>
         policy.Requirements.Add(new ProfileTypeRequirement(ProfileType.Shelter)));
+
+    options.AddPolicy("IsBusiness", policy =>
+        policy.Requirements.Add(new ProfileTypeRequirement(ProfileType.Business)));
 });
 
 
