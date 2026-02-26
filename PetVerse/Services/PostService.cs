@@ -15,9 +15,8 @@ namespace PetVerse.Services
             _context = context;
         }
 
-        private static void ValidateData(CreateTypedPostDTO dto)
+        private static List<string> ValidateSimpleData(CreateSimplePostDTO dto)
         {
-            List<string> animalTypes = ["cat", "dog", "other"];
             var errors = new List<string>();
 
             if (string.IsNullOrEmpty(dto.Title) || string.IsNullOrWhiteSpace(dto.Title))
@@ -30,6 +29,14 @@ namespace PetVerse.Services
 
             if (string.IsNullOrEmpty(dto.Body) || string.IsNullOrWhiteSpace(dto.Body))
                 errors.Add("Post content (body) is required");
+            
+            return errors;
+        }
+
+        private static void ValidateData(CreateTypedPostDTO dto)
+        {
+            List<string> animalTypes = ["cat", "dog", "other"];
+            var errors = ValidateSimpleData(dto);
 
             if (dto.Photo == null
             || dto.Photo.Name == null
@@ -47,7 +54,45 @@ namespace PetVerse.Services
                 throw new ValidationException(string.Join(", ", errors));
         }
 
-        private async Task SaveToDbAsync(PhotoPost post, CreateTypedPostDTO dto, string photoType)
+        private static async Task<string> SaveSinglePhotoAsync(Post post, IFormFile photo, string photoType, int index)
+        {
+            string path = Path.Combine(Environment.CurrentDirectory, "Images", $"{photoType}s");
+            Directory.CreateDirectory(path);
+
+            string extension = Path.GetExtension(photo.FileName);
+            string name = Path.GetFileNameWithoutExtension(photo.FileName);
+            string fileName = $"{name}_{photoType}_{index}_{post.Id}{extension}";
+            string filePath = Path.Combine(path, fileName);
+            using (Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            {
+                await photo.CopyToAsync(fileStream);
+            }
+
+            return fileName;
+        }
+
+        private static async Task SavePhotoPathToPost(PhotoPost post, CreateTypedPostDTO dto, string photoType)
+        {
+            post.PhotoPath = await SaveSinglePhotoAsync(post,dto.Photo,photoType,0);
+        }
+
+        private async Task SaveMultiplePhotosToBusinessPost(BusinessPost post, CreateBusinessPostDTO dto, string photoType)
+        {
+            List<PostMedia> medias = [];
+            for(int i = 0; i<dto.Media.Count;i++)
+            {
+                PostMedia postMedia = new PostMedia
+                {
+                    Path = await SaveSinglePhotoAsync(post,dto.Media[i],photoType,i),
+                    BusinessPostId = post.Id
+                };
+                medias.Add(postMedia);
+                post.PostMedias = medias;
+                _context.PostMedias.Add(postMedia);
+            }
+        }
+
+        private async Task SaveToDbAsync(Post post, CreateSimplePostDTO dto, string photoType)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -56,19 +101,14 @@ namespace PetVerse.Services
 
                 await _context.SaveChangesAsync();
 
-                string path = Path.Combine(Environment.CurrentDirectory, "Images", $"{photoType}s");
-                Directory.CreateDirectory(path);
-
-                string extension = Path.GetExtension(dto.Photo.FileName);
-                string name = Path.GetFileNameWithoutExtension(dto.Photo.FileName);
-                string fileName = $"{name}_{photoType}_{post.Id}{extension}";
-                string filePath = Path.Combine(path, fileName);
-                using (Stream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                if (post is PhotoPost && dto is CreateTypedPostDTO)
                 {
-                    await dto.Photo.CopyToAsync(fileStream);
+                    await SavePhotoPathToPost((PhotoPost)post, (CreateTypedPostDTO)dto, photoType);
                 }
-
-                post.PhotoPath = fileName;
+                else if(post is BusinessPost)
+                {
+                    await SaveMultiplePhotosToBusinessPost((BusinessPost)post,(CreateBusinessPostDTO)dto,"Business");
+                }
 
                 await _context.SaveChangesAsync();
 
@@ -82,7 +122,7 @@ namespace PetVerse.Services
             catch (IOException)
             {
                 await transaction.RollbackAsync();
-                throw new InvalidOperationException("Error saving animal photo file to disk");
+                throw new InvalidOperationException("Error saving photo file to disk");
             }
             catch (ArgumentException)
             {
@@ -147,6 +187,40 @@ namespace PetVerse.Services
         internal async Task<AnimalAdoptionPost?> GetAnimalAdoptionPostByIdAsync(int id)
         {
             return await _context.AnimalAdoptionPosts.FindAsync(id);
+        }
+
+        public async Task<BusinessPost> CreateBusinessPostAsync(string userId, CreateBusinessPostDTO dto)
+        {
+            List<string> errors = [];
+            errors = ValidateSimpleData(dto);
+            if (dto.Media == null || !dto.Media.Any())
+                errors.Add("Media is required");
+            if (dto.Media == null || !dto.Media.Any(m => m.Length > 0))
+                errors.Add("At least one non-empty file is required");
+            if (errors.Any())
+                throw new ValidationException(string.Join(", ", errors));
+
+            var post = new BusinessPost
+            {
+                Title = dto.Title,
+                Body = dto.Body,
+                BusinessProfileId = dto.BusinessId,
+                UserId = userId,
+                Published = DateTime.Now,
+                PostMedias = []
+            };
+
+            string photoType = "Business";
+            await SaveToDbAsync(post, dto, photoType);
+            return post;
+        }
+
+        internal async Task<BusinessPost?> GetBusinessPostByIdAsync(int id)
+        {
+            var post = await _context.BusinessPosts.FindAsync(id);
+            if (post != null)
+                post.PostMedias = [.. _context.PostMedias.Where(x=>x.BusinessPostId==post.Id)];
+            return post;
         }
     }
 
