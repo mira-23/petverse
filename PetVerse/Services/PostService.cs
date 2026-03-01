@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using PetVerse.Classes;
 using PetVerse.Data;
 using PetVerse.DTOs;
 using PetVerse.Models;
+using PetVerse.Queries;
 
 namespace PetVerse.Services
 {
@@ -147,7 +149,8 @@ namespace PetVerse.Services
                 Body = dto.Body,
                 Type = dto.Type,
                 UserId = userId,
-                Status = "notFound"
+                Status = "notFound",
+                Published = DateTime.Now
             };
 
             string photoType = "LostAnimal";
@@ -221,6 +224,80 @@ namespace PetVerse.Services
             if (post != null)
                 post.PostMedias = [.. _context.PostMedias.Where(x=>x.BusinessPostId==post.Id)];
             return post;
+        }
+
+        private bool DoesUserOwnProfile(Post post,int profileId, string? userId)
+        {
+            if (userId == null)
+                return false;
+
+            if(post is AnimalAdoptionPost)
+            {
+                return _context.UserToShelterProfileMapping
+                .Any(us => us.UserId == userId && us.ShelterProfileId == profileId);
+            }
+            else if(post is BusinessPost)
+            {
+                bool a = _context.UserToBusinessProfileMapping
+                .Any(us => us.UserId == userId && us.BusinessProfileId == profileId);
+                return a;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public IQueryable<DashboardPostRepsonseDTO> FindAllPosts(string? userId, string path)
+        {
+            var businessPosts = _context.BusinessPosts.ToList();
+            var shelterPosts = _context.AnimalAdoptionPosts.ToList();
+            var lostAnimalPosts = _context.LostAnimalPosts.ToList();
+
+            var dashboardPostDtos = new List<DashboardPostRepsonseDTO>();
+
+            dashboardPostDtos.AddRange(businessPosts.Select(bp => new DashboardPostRepsonseDTO
+                {
+                    Title = bp.Title,
+                    Body = bp.Body,
+                    UserId = DoesUserOwnProfile(bp,bp.BusinessProfileId,userId) ? bp.UserId : null,
+                    Published = bp.Published,
+                    MediaPaths = [.. _context.PostMedias.Where(x => x.BusinessPostId == bp.Id).Select(x=>$"{path}/Images/Businesss/{x.Path}")],
+                    BusinessId = bp.BusinessProfileId
+                }));
+
+                dashboardPostDtos.AddRange(shelterPosts.Select(sp => new DashboardPostRepsonseDTO
+                {
+                    Title = sp.Title,
+                    Body = sp.Body,
+                    UserId = DoesUserOwnProfile(sp,sp.ShelterProfileId,userId) ? sp.UserId : null,
+                    Published = sp.Published,
+                    PhotoPath = sp.PhotoPath,
+                    Type = sp.Type,
+                    ShelterId = sp.ShelterProfileId,
+                    AdoptedAt = sp.AdoptedAt,
+                    Status = sp.Status
+                }));
+
+                dashboardPostDtos.AddRange(lostAnimalPosts.Select(lp => new DashboardPostRepsonseDTO
+                {
+                    Id = lp.Id,
+                    Title = lp.Title,
+                    Body = lp.Body,
+                    UserId = lp.UserId,
+                    Published = lp.Published,
+                    PhotoPath = lp.PhotoPath,
+                    Type = lp.Type,
+                    Status = lp.Status
+                }));
+
+                return dashboardPostDtos.AsQueryable();
+        }
+
+        public PagedList<DashboardPostRepsonseDTO> GetPosts(PostParameters postParameters, string? userId, string path)
+        {
+            return PagedList<DashboardPostRepsonseDTO>.ToPagedList(FindAllPosts(userId,path).OrderByDescending(x=>x.Published),
+                postParameters.PageNumber);
         }
     }
 
