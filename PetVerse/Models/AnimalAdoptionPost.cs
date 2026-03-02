@@ -5,7 +5,6 @@ namespace PetVerse.Models
         public required string Type { get; set; }
         public int ShelterProfileId { get; set; }
         public required string UserId { get; set; }
-        public required DateTime Published { get; set; }
         public DateTime? AdoptedAt { get; set; }
         public required string Status { get; set; }
     }

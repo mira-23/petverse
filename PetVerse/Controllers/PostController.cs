@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PetVerse.DTOs;
 using PetVerse.Models;
+using PetVerse.Queries;
 using PetVerse.Services;
 
 namespace PetVerse.Controllers
@@ -74,7 +75,8 @@ namespace PetVerse.Controllers
                 Type = result.Type,
                 Body = result.Body,
                 UserId = result.UserId,
-                Status = result.Status
+                Status = result.Status,
+                Published = result.Published
             };
 
             return CreatedAtAction(nameof(GetLostAnimalPostById), new { id = responseDTO.Id }, responseDTO);
@@ -98,7 +100,8 @@ namespace PetVerse.Controllers
                 Type = post.Type,
                 Body = post.Body,
                 UserId = post.UserId,
-                Status = post.Status
+                Status = post.Status,
+                Published = post.Published
             };
             return Ok(responseDTO);
         }
@@ -266,6 +269,14 @@ namespace PetVerse.Controllers
             };
 
             return Ok(responseDTO);
+        }
+
+        [HttpGet]
+        public IActionResult GetPosts([FromQuery] PostParameters postParameters)
+        {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var posts = _postService.GetPosts(postParameters,userId,$"{Request.Scheme}://{Request.Host}");
+            return Ok(posts);
         }
     }
 }
