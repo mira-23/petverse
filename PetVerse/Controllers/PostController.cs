@@ -315,6 +315,58 @@ namespace PetVerse.Controllers
             responseDTO.PhotoPath = $"{Request.Scheme}://{Request.Host}/Images/LostAnimals/{fileName}";
             return Ok(responseDTO);
         }
+
+        [HttpPut("shelter/animal_adoption/adopt")]
+        public async Task<IActionResult> MarkAnimalAsAdopted(AdoptionRequestAnswerDTO dto)
+        {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var adoptionPost = await _postService.GetAnimalAdoptionPostByIdAsync(dto.AdoptionPostId);
+            if(adoptionPost == null)
+            {
+                return NotFound();
+            }
+
+            //dummy dto to use for authorization
+            CreateAnimalAdoptionPostDTO createDto = new()
+            {
+                Title = "",
+                Body = "",
+                Photo = new FormFile(Stream.Null, 0, 0, "", ""),
+                Type = "",
+                ShelterId = adoptionPost.ShelterProfileId
+            };
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(
+            User,
+            createDto,
+            "IsShelter");
+
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+
+            try
+            {
+                await _postService.MarkAnimalAsAdopted(dto);
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException e)
+            {
+                return StatusCode(500, e.Message);
+            }
+
+            return NoContent();
+        }
     }
 }
 

@@ -7,5 +7,6 @@ namespace PetVerse.Models
         public required string UserId { get; set; }
         public DateTime? AdoptedAt { get; set; }
         public required string Status { get; set; }
+        public virtual ICollection<AdoptionRequest>? AdoptionRequests {get;set;}
     }
 }

@@ -22,6 +22,8 @@ namespace PetVerse.Data
 
         public DbSet<PostMedia> PostMedias { get; set; }
 
+        public DbSet<AdoptionRequest> AdoptionRequests { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
@@ -75,6 +77,24 @@ namespace PetVerse.Data
             builder.Entity<BusinessProfile>()
                 .HasIndex(b => b.Name)
                 .IsUnique();
+
+            // Adoption Request Mapping
+
+            builder.Entity<AdoptionRequest>()
+                .HasIndex(e => new { e.UserId, e.AdoptionPostId })
+                .IsUnique();
+
+            builder.Entity<AdoptionRequest>()
+                .HasOne(e => e.User)
+                .WithMany(u => u.AdoptionRequests)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<AdoptionRequest>()
+                .HasOne(e => e.AnimalAdoptionPost)
+                .WithMany(b => b.AdoptionRequests)
+                .HasForeignKey(e => e.AdoptionPostId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
 

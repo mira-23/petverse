@@ -66,6 +66,7 @@ namespace PetVerse.Services
             {
                 if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
                 {
+                    await transaction.RollbackAsync();
                     throw new ValidationException($"{profileType} profile name already exists!");
                 }
 
