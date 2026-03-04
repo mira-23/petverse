@@ -339,6 +339,37 @@ namespace PetVerse.Services
                 Status = post.Status
             };
         }
+
+        public async Task MarkAnimalAsAdopted(AdoptionRequestAnswerDTO dto)
+        {
+            var post = _context.AnimalAdoptionPosts.First(x=>x.Id == dto.AdoptionPostId);
+
+            if (post.Status != "available")
+            {
+                throw new InvalidOperationException("Animal already marked as adopted!");
+            }
+
+            post.Status = "adopted";
+            post.AdoptedAt = DateTime.Now;
+            _context.AdoptionRequests.Where(x=>x.AdoptionPostId == dto.AdoptionPostId).ToList().ForEach(x=>x.Status = "rejected");
+            
+            var acceptedRequest = _context.AdoptionRequests
+                .FirstOrDefault(x=>x.UserId==dto.userId && x.AdoptionPostId == dto.AdoptionPostId);
+
+            if(acceptedRequest!=null)
+            {
+                acceptedRequest.Status = "accepted";
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new DbUpdateConcurrencyException("Error saving to database");
+            }
+        }
     }
 
 }
