@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PetVerse.DTOs;
 using PetVerse.Models;
-using PetVerse.Queries;
 using PetVerse.Services;
 
 namespace PetVerse.Controllers

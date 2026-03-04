@@ -1,12 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using PetVerse.Classes;
 using PetVerse.Data;
 using PetVerse.DTOs;
 using PetVerse.Models;
-using PetVerse.Queries;
-using SQLitePCL;
 
 namespace PetVerse.Services
 {
@@ -30,6 +27,15 @@ namespace PetVerse.Services
             {
                 errors.Add("Adoption post does not exist!");
             }
+            var post = _context.AnimalAdoptionPosts.FirstOrDefault(x=>x.Id == dto.AdoptionPostId);
+            if (post != null)
+            {
+                if (post.Status=="adopted")
+                    {
+                        errors.Add("Animal is already adopted!");
+                    }
+            }
+            
             
             if (errors.Any())
                 throw new ValidationException(string.Join(", ", errors));
