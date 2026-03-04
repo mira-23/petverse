@@ -278,6 +278,43 @@ namespace PetVerse.Controllers
             var posts = _postService.GetPosts(postParameters,userId,$"{Request.Scheme}://{Request.Host}");
             return Ok(posts);
         }
+
+        [HttpPut("user/lost_animal/{id}")]
+        public async Task<IActionResult> MarkLostAnimalAsFound(int id)
+        {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            FoundAnimalPostRepsonseDTO responseDTO;
+            try
+            {
+                responseDTO = await _postService.MarkLostAnimalAsFound(id, userId);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException)
+            {
+                return Forbid();
+            }
+            catch (InvalidOperationException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException e)
+            {
+                return StatusCode(500, e.Message);
+            }
+
+            string fileName = responseDTO.PhotoPath;
+            responseDTO.PhotoPath = $"{Request.Scheme}://{Request.Host}/Images/LostAnimals/{fileName}";
+            return Ok(responseDTO);
+        }
     }
 }
 

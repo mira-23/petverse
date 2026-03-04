@@ -299,6 +299,46 @@ namespace PetVerse.Services
             return PagedList<DashboardPostRepsonseDTO>.ToPagedList(FindAllPosts(userId,path).OrderByDescending(x=>x.Published),
                 postParameters.PageNumber);
         }
+
+        public async Task<FoundAnimalPostRepsonseDTO> MarkLostAnimalAsFound(int id, string userId)
+        {
+            var post = _context.LostAnimalPosts.FirstOrDefault(x=>x.Id == id);
+            if (post == null)
+            {
+                throw new KeyNotFoundException();
+            }
+
+            if (post.UserId != userId)
+            {
+                throw new ArgumentException();
+            }
+
+            if (post.Status == "found")
+            {
+                throw new InvalidOperationException("Pet already marked as found");
+            }
+
+            post.Status = "found"; 
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new DbUpdateConcurrencyException("Error saving to database");
+            }
+
+            return new FoundAnimalPostRepsonseDTO
+            {
+                Id = post.Id,
+                PhotoPath = post.PhotoPath,
+                Title = post.Title,
+                Body = post.Body,
+                UserId = post.UserId,
+                Status = post.Status
+            };
+        }
     }
 
 }
