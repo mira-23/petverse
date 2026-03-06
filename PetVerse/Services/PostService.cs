@@ -259,6 +259,7 @@ namespace PetVerse.Services
             dashboardPostDtos.AddRange(businessPosts.Select(bp => new DashboardPostRepsonseDTO
             {
                 Id = bp.Id,
+                PostType = "business",
                 Title = bp.Title,
                 Body = bp.Body,
                 UserId = DoesUserOwnProfile(bp, bp.BusinessProfileId, userId) ? bp.UserId : null,
@@ -270,6 +271,7 @@ namespace PetVerse.Services
             dashboardPostDtos.AddRange(shelterPosts.Select(sp => new DashboardPostRepsonseDTO
             {
                 Id = sp.Id,
+                PostType = "adoption",
                 Title = sp.Title,
                 Body = sp.Body,
                 UserId = DoesUserOwnProfile(sp, sp.ShelterProfileId, userId) ? sp.UserId : null,
@@ -284,6 +286,7 @@ namespace PetVerse.Services
             dashboardPostDtos.AddRange(lostAnimalPosts.Select(lp => new DashboardPostRepsonseDTO
             {
                 Id = lp.Id,
+                PostType = "lostAnimal",
                 Title = lp.Title,
                 Body = lp.Body,
                 UserId = lp.UserId,
