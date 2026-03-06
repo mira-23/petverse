@@ -21,7 +21,7 @@ namespace PetVerse.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateAnimalAdoptionPost(CreateAdoptionRequestDTO dto)
+        public async Task<IActionResult> CreateAdoptionRequest(CreateAdoptionRequestDTO dto)
         {
             if (!ModelState.IsValid)
             {
@@ -65,6 +65,7 @@ namespace PetVerse.Controllers
             return CreatedAtAction(nameof(GetAdoptionRequestById), new { id = result.Id }, responseDTO);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<AnimalAdoptionPostRepsonseDTO>> GetAdoptionRequestById(int id)
         {
