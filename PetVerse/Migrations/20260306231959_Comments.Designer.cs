@@ -12,7 +12,7 @@ using PetVerse.Data;
 namespace PetVerse.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260306222045_Comments")]
+    [Migration("20260306231959_Comments")]
     partial class Comments
     {
         /// <inheritdoc />
@@ -403,9 +403,8 @@ namespace PetVerse.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("PublishedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("PublishedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()

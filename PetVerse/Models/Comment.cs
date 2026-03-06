@@ -9,7 +9,7 @@ namespace PetVerse.Models
         public required string PostType { get; set; }
         public required string UserId { get; set; }
         public required string Content { get; set; }
-        public required string PublishedAt { get; set; }
+        public required DateTime PublishedAt { get; set; }
         public AnimalAdoptionPost? AnimalAdoptionPost { get; set; }
         public LostAnimalPost? LostAnimalPost { get; set; }
         public BusinessPost? BusinessPost { get; set; }
