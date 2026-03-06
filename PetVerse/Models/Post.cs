@@ -9,6 +9,8 @@ namespace PetVerse.Models
         public required string Body { get; set; }
 
         public required DateTime Published { get; set; }
+
+        public virtual ICollection<Comment>? Comments { get; set; }
     }
 }
 
