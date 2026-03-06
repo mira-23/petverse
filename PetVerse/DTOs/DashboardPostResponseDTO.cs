@@ -5,6 +5,7 @@ namespace PetVerse.DTOs
     public class DashboardPostRepsonseDTO
     {
         public int? Id { get; set; }
+        public required string PostType { get; set; }
 
         [Description("Must be between 5-128 characters")]
         public required string Title { get; set; }

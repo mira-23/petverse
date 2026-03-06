@@ -31,7 +31,7 @@ namespace PetVerse.Services
 
             if (string.IsNullOrEmpty(dto.Body) || string.IsNullOrWhiteSpace(dto.Body))
                 errors.Add("Post content (body) is required");
-            
+
             return errors;
         }
 
@@ -75,17 +75,17 @@ namespace PetVerse.Services
 
         private static async Task SavePhotoPathToPost(PhotoPost post, CreateTypedPostDTO dto, string photoType)
         {
-            post.PhotoPath = await SaveSinglePhotoAsync(post,dto.Photo,photoType,0);
+            post.PhotoPath = await SaveSinglePhotoAsync(post, dto.Photo, photoType, 0);
         }
 
         private async Task SaveMultiplePhotosToBusinessPost(BusinessPost post, CreateBusinessPostDTO dto, string photoType)
         {
             List<PostMedia> medias = [];
-            for(int i = 0; i<dto.Media.Count;i++)
+            for (int i = 0; i < dto.Media.Count; i++)
             {
                 PostMedia postMedia = new PostMedia
                 {
-                    Path = await SaveSinglePhotoAsync(post,dto.Media[i],photoType,i),
+                    Path = await SaveSinglePhotoAsync(post, dto.Media[i], photoType, i),
                     BusinessPostId = post.Id
                 };
                 medias.Add(postMedia);
@@ -107,9 +107,9 @@ namespace PetVerse.Services
                 {
                     await SavePhotoPathToPost((PhotoPost)post, (CreateTypedPostDTO)dto, photoType);
                 }
-                else if(post is BusinessPost)
+                else if (post is BusinessPost)
                 {
-                    await SaveMultiplePhotosToBusinessPost((BusinessPost)post,(CreateBusinessPostDTO)dto,"Business");
+                    await SaveMultiplePhotosToBusinessPost((BusinessPost)post, (CreateBusinessPostDTO)dto, "Business");
                 }
 
                 await _context.SaveChangesAsync();
@@ -222,21 +222,21 @@ namespace PetVerse.Services
         {
             var post = await _context.BusinessPosts.FindAsync(id);
             if (post != null)
-                post.PostMedias = [.. _context.PostMedias.Where(x=>x.BusinessPostId==post.Id)];
+                post.PostMedias = [.. _context.PostMedias.Where(x => x.BusinessPostId == post.Id)];
             return post;
         }
 
-        private bool DoesUserOwnProfile(Post post,int profileId, string? userId)
+        private bool DoesUserOwnProfile(Post post, int profileId, string? userId)
         {
             if (userId == null)
                 return false;
 
-            if(post is AnimalAdoptionPost)
+            if (post is AnimalAdoptionPost)
             {
                 return _context.UserToShelterProfileMapping
                 .Any(us => us.UserId == userId && us.ShelterProfileId == profileId);
             }
-            else if(post is BusinessPost)
+            else if (post is BusinessPost)
             {
                 bool a = _context.UserToBusinessProfileMapping
                 .Any(us => us.UserId == userId && us.BusinessProfileId == profileId);
@@ -248,7 +248,7 @@ namespace PetVerse.Services
             }
         }
 
-        public IQueryable<DashboardPostRepsonseDTO> FindAllPosts(string? userId, string path)
+        public IQueryable<DashboardPostRepsonseDTO> FindAllPosts(string? userId)
         {
             var businessPosts = _context.BusinessPosts.ToList();
             var shelterPosts = _context.AnimalAdoptionPosts.ToList();
@@ -257,52 +257,57 @@ namespace PetVerse.Services
             var dashboardPostDtos = new List<DashboardPostRepsonseDTO>();
 
             dashboardPostDtos.AddRange(businessPosts.Select(bp => new DashboardPostRepsonseDTO
-                {
-                    Title = bp.Title,
-                    Body = bp.Body,
-                    UserId = DoesUserOwnProfile(bp,bp.BusinessProfileId,userId) ? bp.UserId : null,
-                    Published = bp.Published,
-                    MediaPaths = [.. _context.PostMedias.Where(x => x.BusinessPostId == bp.Id).Select(x=>$"{path}/Images/Businesss/{x.Path}")],
-                    BusinessId = bp.BusinessProfileId
-                }));
+            {
+                Id = bp.Id,
+                PostType = "business",
+                Title = bp.Title,
+                Body = bp.Body,
+                UserId = DoesUserOwnProfile(bp, bp.BusinessProfileId, userId) ? bp.UserId : null,
+                Published = bp.Published,
+                MediaPaths = [.. _context.PostMedias.Where(x => x.BusinessPostId == bp.Id).Select(x => $"Images/Businesss/{x.Path}")],
+                BusinessId = bp.BusinessProfileId
+            }));
 
-                dashboardPostDtos.AddRange(shelterPosts.Select(sp => new DashboardPostRepsonseDTO
-                {
-                    Title = sp.Title,
-                    Body = sp.Body,
-                    UserId = DoesUserOwnProfile(sp,sp.ShelterProfileId,userId) ? sp.UserId : null,
-                    Published = sp.Published,
-                    PhotoPath = sp.PhotoPath,
-                    Type = sp.Type,
-                    ShelterId = sp.ShelterProfileId,
-                    AdoptedAt = sp.AdoptedAt,
-                    Status = sp.Status
-                }));
+            dashboardPostDtos.AddRange(shelterPosts.Select(sp => new DashboardPostRepsonseDTO
+            {
+                Id = sp.Id,
+                PostType = "adoption",
+                Title = sp.Title,
+                Body = sp.Body,
+                UserId = DoesUserOwnProfile(sp, sp.ShelterProfileId, userId) ? sp.UserId : null,
+                Published = sp.Published,
+                PhotoPath = $"Images/AnimalAdoptions/{sp.PhotoPath}",
+                Type = sp.Type,
+                ShelterId = sp.ShelterProfileId,
+                AdoptedAt = sp.AdoptedAt,
+                Status = sp.Status
+            }));
 
-                dashboardPostDtos.AddRange(lostAnimalPosts.Select(lp => new DashboardPostRepsonseDTO
-                {
-                    Id = lp.Id,
-                    Title = lp.Title,
-                    Body = lp.Body,
-                    UserId = lp.UserId,
-                    Published = lp.Published,
-                    PhotoPath = lp.PhotoPath,
-                    Type = lp.Type,
-                    Status = lp.Status
-                }));
+            dashboardPostDtos.AddRange(lostAnimalPosts.Select(lp => new DashboardPostRepsonseDTO
+            {
+                Id = lp.Id,
+                PostType = "lostAnimal",
+                Title = lp.Title,
+                Body = lp.Body,
+                UserId = lp.UserId,
+                Published = lp.Published,
+                PhotoPath = $"Images/LostAnimals/{lp.PhotoPath}",
+                Type = lp.Type,
+                Status = lp.Status
+            }));
 
-                return dashboardPostDtos.AsQueryable();
+            return dashboardPostDtos.AsQueryable();
         }
 
-        public PagedList<DashboardPostRepsonseDTO> GetPosts(PostParameters postParameters, string? userId, string path)
+        public PagedList<DashboardPostRepsonseDTO> GetPosts(PostParameters postParameters, string? userId)
         {
-            return PagedList<DashboardPostRepsonseDTO>.ToPagedList(FindAllPosts(userId,path).OrderByDescending(x=>x.Published),
+            return PagedList<DashboardPostRepsonseDTO>.ToPagedList(FindAllPosts(userId).OrderByDescending(x => x.Published),
                 postParameters.PageNumber);
         }
 
         public async Task<FoundAnimalPostRepsonseDTO> MarkLostAnimalAsFound(int id, string userId)
         {
-            var post = _context.LostAnimalPosts.FirstOrDefault(x=>x.Id == id);
+            var post = _context.LostAnimalPosts.FirstOrDefault(x => x.Id == id);
             if (post == null)
             {
                 throw new KeyNotFoundException();
@@ -318,7 +323,7 @@ namespace PetVerse.Services
                 throw new InvalidOperationException("Pet already marked as found");
             }
 
-            post.Status = "found"; 
+            post.Status = "found";
 
             try
             {
@@ -342,7 +347,7 @@ namespace PetVerse.Services
 
         public async Task MarkAnimalAsAdopted(AdoptionRequestAnswerDTO dto)
         {
-            var post = _context.AnimalAdoptionPosts.First(x=>x.Id == dto.AdoptionPostId);
+            var post = _context.AnimalAdoptionPosts.First(x => x.Id == dto.AdoptionPostId);
 
             if (post.Status != "available")
             {
@@ -351,12 +356,12 @@ namespace PetVerse.Services
 
             post.Status = "adopted";
             post.AdoptedAt = DateTime.Now;
-            _context.AdoptionRequests.Where(x=>x.AdoptionPostId == dto.AdoptionPostId).ToList().ForEach(x=>x.Status = "rejected");
-            
-            var acceptedRequest = _context.AdoptionRequests
-                .FirstOrDefault(x=>x.UserId==dto.userId && x.AdoptionPostId == dto.AdoptionPostId);
+            _context.AdoptionRequests.Where(x => x.AdoptionPostId == dto.AdoptionPostId).ToList().ForEach(x => x.Status = "rejected");
 
-            if(acceptedRequest!=null)
+            var acceptedRequest = _context.AdoptionRequests
+                .FirstOrDefault(x => x.UserId == dto.userId && x.AdoptionPostId == dto.AdoptionPostId);
+
+            if (acceptedRequest != null)
             {
                 acceptedRequest.Status = "accepted";
             }

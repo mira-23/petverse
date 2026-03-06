@@ -238,7 +238,7 @@ namespace PetVerse.Controllers
             var responseDTO = new BusinessPostRepsonseDTO
             {
                 BusinessId = result.BusinessProfileId,
-                MediaPaths = [.. result.PostMedias.Select(x=>$"{Request.Scheme}://{Request.Host}/Images/Businesss/{x.Path}")],
+                MediaPaths = [.. result.PostMedias.Select(x => $"{Request.Scheme}://{Request.Host}/Images/Businesss/{x.Path}")],
                 Title = result.Title,
                 Body = result.Body,
                 UserId = result.UserId,
@@ -261,7 +261,7 @@ namespace PetVerse.Controllers
             var responseDTO = new BusinessPostRepsonseDTO
             {
                 BusinessId = post.BusinessProfileId,
-                MediaPaths = [.. post.PostMedias.Select(x=>$"{Request.Scheme}://{Request.Host}/Images/Businesss/{x.Path}")],
+                MediaPaths = [.. post.PostMedias.Select(x => $"{Request.Scheme}://{Request.Host}/Images/Businesss/{x.Path}")],
                 Title = post.Title,
                 Body = post.Body,
                 UserId = post.UserId,
@@ -275,7 +275,7 @@ namespace PetVerse.Controllers
         public IActionResult GetPosts([FromQuery] PostParameters postParameters)
         {
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var posts = _postService.GetPosts(postParameters,userId,$"{Request.Scheme}://{Request.Host}");
+            var posts = _postService.GetPosts(postParameters, userId);
             return Ok(posts);
         }
 
@@ -327,7 +327,7 @@ namespace PetVerse.Controllers
             }
 
             var adoptionPost = await _postService.GetAnimalAdoptionPostByIdAsync(dto.AdoptionPostId);
-            if(adoptionPost == null)
+            if (adoptionPost == null)
             {
                 return NotFound();
             }
