@@ -12,7 +12,7 @@ using PetVerse.Data;
 namespace PetVerse.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260306231959_Comments")]
+    [Migration("20260307000153_Comments")]
     partial class Comments
     {
         /// <inheritdoc />
@@ -392,16 +392,22 @@ namespace PetVerse.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AnimalAdoptionPostId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BusinessPostId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PostId")
+                    b.Property<int?>("LostAnimalPostId")
                         .HasColumnType("int");
 
                     b.Property<string>("PostType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("PublishedAt")
                         .HasColumnType("datetime2");
@@ -412,9 +418,13 @@ namespace PetVerse.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("AnimalAdoptionPostId");
 
-                    b.HasIndex("PostId", "PostType");
+                    b.HasIndex("BusinessPostId");
+
+                    b.HasIndex("LostAnimalPostId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comments");
                 });
@@ -672,17 +682,17 @@ namespace PetVerse.Migrations
                 {
                     b.HasOne("PetVerse.Models.AnimalAdoptionPost", "AnimalAdoptionPost")
                         .WithMany("Comments")
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("AnimalAdoptionPostId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PetVerse.Models.BusinessPost", "BusinessPost")
                         .WithMany("Comments")
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("BusinessPostId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PetVerse.Models.LostAnimalPost", "LostAnimalPost")
                         .WithMany("Comments")
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("LostAnimalPostId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("PetVerse.Entities.User", "User")

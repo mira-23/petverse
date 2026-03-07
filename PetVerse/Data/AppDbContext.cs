@@ -101,35 +101,29 @@ namespace PetVerse.Data
             // Comments Relationship setup
 
             builder.Entity<Comment>()
-                .HasIndex(e => new { e.PostId, e.PostType });
-
-            builder.Entity<Comment>()
                 .HasOne(e => e.User)
                 .WithMany(u => u.Comments)
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Comment>()
-                .HasOne(e => e.AnimalAdoptionPost)
+                .HasOne(e => e.LostAnimalPost)
                 .WithMany(p => p.Comments)
-                .HasForeignKey(e => e.PostId)
-                .HasPrincipalKey(p => p.Id)
+                .HasForeignKey(e => e.LostAnimalPostId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Comment>()
-                .HasOne(e => e.LostAnimalPost)
+                .HasOne(e => e.AnimalAdoptionPost)
                 .WithMany(p => p.Comments)
-                .HasForeignKey(e => e.PostId)
-                .HasPrincipalKey(p => p.Id)
+                .HasForeignKey(e => e.AnimalAdoptionPostId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Comment>()
                 .HasOne(e => e.BusinessPost)
                 .WithMany(p => p.Comments)
-                .HasForeignKey(e => e.PostId)
-                .HasPrincipalKey(p => p.Id)
+                .HasForeignKey(e => e.BusinessPostId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
