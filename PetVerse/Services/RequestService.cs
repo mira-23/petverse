@@ -23,20 +23,20 @@ namespace PetVerse.Services
             if (string.IsNullOrEmpty(dto.Message) || string.IsNullOrWhiteSpace(dto.Message))
                 errors.Add("Message is required");
 
-            if (!_context.AnimalAdoptionPosts.Any(x=>x.Id == dto.AdoptionPostId))
+            if (!_context.AnimalAdoptionPosts.Any(x => x.Id == dto.AdoptionPostId))
             {
                 errors.Add("Adoption post does not exist!");
             }
-            var post = _context.AnimalAdoptionPosts.FirstOrDefault(x=>x.Id == dto.AdoptionPostId);
+            var post = _context.AnimalAdoptionPosts.FirstOrDefault(x => x.Id == dto.AdoptionPostId);
             if (post != null)
             {
-                if (post.Status=="adopted")
-                    {
-                        errors.Add("Animal is already adopted!");
-                    }
+                if (post.Status == "adopted")
+                {
+                    errors.Add("Animal is already adopted!");
+                }
             }
-            
-            
+
+
             if (errors.Any())
                 throw new ValidationException(string.Join(", ", errors));
         }
@@ -63,7 +63,7 @@ namespace PetVerse.Services
             catch (Exception e)
             {
                 await transaction.RollbackAsync();
-                throw new InvalidOperationException($"An error occurred while creating the post: {e.Message}");
+                throw new InvalidOperationException($"An error occurred while creating the request: {e.Message}");
             }
         }
 

@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace PetVerse.DTOs
 {
     public abstract class CreatePostDTO : CreateSimplePostDTO

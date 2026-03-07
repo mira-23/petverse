@@ -24,6 +24,8 @@ namespace PetVerse.Data
 
         public DbSet<AdoptionRequest> AdoptionRequests { get; set; }
 
+        public DbSet<Comment> Comments { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
@@ -95,6 +97,35 @@ namespace PetVerse.Data
                 .WithMany(b => b.AdoptionRequests)
                 .HasForeignKey(e => e.AdoptionPostId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Comments Relationship setup
+
+            builder.Entity<Comment>()
+                .HasOne(e => e.User)
+                .WithMany(u => u.Comments)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Comment>()
+                .HasOne(e => e.LostAnimalPost)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(e => e.LostAnimalPostId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Comment>()
+                .HasOne(e => e.AnimalAdoptionPost)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(e => e.AnimalAdoptionPostId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Comment>()
+                .HasOne(e => e.BusinessPost)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(e => e.BusinessPostId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
 
