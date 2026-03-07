@@ -95,7 +95,7 @@ namespace PetVerse.Services
             };
 
             if (!postExists)
-                throw new KeyNotFoundException($"No {commentParameters.Type} post found with id {commentParameters.PostId}");
+                throw new KeyNotFoundException();
 
             return _context.Comments.Where(x =>
                 (commentParameters.Type == "lost" && x.LostAnimalPostId == commentParameters.PostId) ||
