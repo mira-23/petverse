@@ -32,7 +32,7 @@ public class ProfileTypeHanlder : AuthorizationHandler<ProfileTypeRequirement>
             return;
         }
 
-        if (requirement.ProfileType == ProfileType.User && context.Resource is CreateLostAnimalPostDTO)
+        if (requirement.ProfileType == ProfileType.User && (context.Resource is CreateLostAnimalPostDTO || context.Resource is CreateEventPostDTO))
         {
             context.Succeed(requirement);
             return;

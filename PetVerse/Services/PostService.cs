@@ -226,6 +226,31 @@ namespace PetVerse.Services
             return post;
         }
 
+        public async Task<EventPost> CreateEventPostAsync(string userId, CreateEventPostDTO dto)
+        {
+             List<string> errors = [];
+            errors = ValidateSimpleData(dto);
+            if (errors.Any())
+                throw new ValidationException(string.Join(", ", errors));
+            var post = new EventPost
+            {
+                Title = dto.Title,
+                Body = dto.Body,
+                UserId = userId,
+                Published = DateTime.Now,
+                From = dto.From,
+                To = dto.To
+            };
+
+            await SaveToDbAsync(post,dto,"none");
+            return post;
+        }
+
+        internal async Task<EventPost?> GetEventPostByIdAsync(int id)
+        {
+            return await _context.EventPosts.FindAsync(id);
+        }
+
         private bool DoesUserOwnProfile(Post post, int profileId, string? userId)
         {
             if (userId == null)
@@ -253,6 +278,7 @@ namespace PetVerse.Services
             var businessPosts = _context.BusinessPosts.ToList();
             var shelterPosts = _context.AnimalAdoptionPosts.ToList();
             var lostAnimalPosts = _context.LostAnimalPosts.ToList();
+            var eventPosts = _context.EventPosts.ToList();
 
             var dashboardPostDtos = new List<DashboardPostRepsonseDTO>();
 
@@ -294,6 +320,18 @@ namespace PetVerse.Services
                 PhotoPath = $"Images/LostAnimals/{lp.PhotoPath}",
                 Type = lp.Type,
                 Status = lp.Status
+            }));
+
+            dashboardPostDtos.AddRange(eventPosts.Select(ep => new DashboardPostRepsonseDTO
+            {
+                Id = ep.Id,
+                PostType = "event",
+                Title = ep.Title,
+                Body = ep.Body,
+                UserId = ep.UserId,
+                Published = ep.Published,
+                From = ep.From,
+                To = ep.To
             }));
 
             return dashboardPostDtos.AsQueryable();

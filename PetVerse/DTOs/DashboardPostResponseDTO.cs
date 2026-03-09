@@ -21,5 +21,7 @@ namespace PetVerse.DTOs
         public string? Status { get; set; }
         public List<string?>? MediaPaths { get; set; }
         public int? BusinessId { get; set; }
+        public DateTime? From { get; set; }
+        public DateTime? To { get; set; }
     }
 }

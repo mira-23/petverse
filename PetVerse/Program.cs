@@ -28,6 +28,7 @@ builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<RequestService>();
 builder.Services.AddScoped<CommentsService>();
+builder.Services.AddScoped<EngagementService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IAuthorizationHandler, ProfileTypeHanlder>();
 
