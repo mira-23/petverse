@@ -21,6 +21,8 @@ namespace PetVerse.Data
         public DbSet<BusinessPost> BusinessPosts { get; set; }
 
         public DbSet<PostMedia> PostMedias { get; set; }
+        public DbSet<EventPost> EventPosts { get; set; }
+        public DbSet<Engagement> Engagements { get; set; }
 
         public DbSet<AdoptionRequest> AdoptionRequests { get; set; }
 
@@ -126,6 +128,29 @@ namespace PetVerse.Data
                 .HasForeignKey(e => e.BusinessPostId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Event post relationship setup
+
+            builder.Entity<Engagement>()
+                .HasOne(e => e.User)
+                .WithMany(u => u.Engagements)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Engagement>()
+                .HasOne(e => e.EventPost)
+                .WithMany(p => p.Engagements)
+                .HasForeignKey(e => e.EventPostId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // User cannot engage with the same type of engagement on the same post
+            builder.Entity<Engagement>()
+                .Property(e => e.UserId)
+                .HasMaxLength(450);
+
+            builder.Entity<Engagement>()
+                .HasIndex(e => new { e.EventPostId, e.UserId, e.Type })
+                .IsUnique();
 
         }
 

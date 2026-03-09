@@ -63,6 +63,7 @@ namespace PetVerse.Controllers
                     "lost" => result.LostAnimalPostId.Value,
                     "adoption" => result.AnimalAdoptionPostId.Value,
                     "service" => result.BusinessPostId.Value,
+                    "event" => result.EventPostId.Value,
                     _ => 0
                 };
             }
@@ -103,6 +104,7 @@ namespace PetVerse.Controllers
                     "lost" => comment.LostAnimalPostId.Value,
                     "adoption" => comment.AnimalAdoptionPostId.Value,
                     "service" => comment.BusinessPostId.Value,
+                    "event" => comment.EventPostId.Value,
                     _ => 0
                 };
             }
@@ -126,9 +128,9 @@ namespace PetVerse.Controllers
         [HttpGet]
         public async Task<IActionResult> GetComments([FromQuery] CommentParameters commentParameters)
         {
-            List<string> postTypes = ["lost", "adoption", "service"];
+            List<string> postTypes = ["lost", "adoption", "service", "event"];
             if (!postTypes.Contains(commentParameters.Type))
-                return BadRequest("Invalid type! Type must be: lost|adoption|service");
+                return BadRequest("Invalid type! Type must be: lost|adoption|service|event");
 
             try
             {

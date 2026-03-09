@@ -11,6 +11,8 @@ namespace PetVerse.Entities
 
         public Pet? Pet { get; set; }
         public ICollection<LostAnimalPost>? LostAnimalPosts { get; set; }
+        public ICollection<EventPost>? EventPosts { get; set; }
+        public ICollection<Engagement>? Engagements { get; set; }
 
         public virtual ICollection<UserToBusinessProfileMapping>? UserToBusinessProfileMapping { get; set; }
 

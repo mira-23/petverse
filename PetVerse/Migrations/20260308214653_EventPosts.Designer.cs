@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetVerse.Data;
 
@@ -11,9 +12,11 @@ using PetVerse.Data;
 namespace PetVerse.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260308214653_EventPosts")]
+    partial class EventPosts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -444,19 +447,17 @@ namespace PetVerse.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("EventPostId");
 
-                    b.HasIndex("EventPostId", "UserId", "Type")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Engagements");
                 });
@@ -758,7 +759,7 @@ namespace PetVerse.Migrations
                         .HasForeignKey("BusinessPostId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("PetVerse.Models.EventPost", "EventPost")
+                    b.HasOne("PetVerse.Models.EventPost", null)
                         .WithMany("Comments")
                         .HasForeignKey("EventPostId");
 
@@ -776,8 +777,6 @@ namespace PetVerse.Migrations
                     b.Navigation("AnimalAdoptionPost");
 
                     b.Navigation("BusinessPost");
-
-                    b.Navigation("EventPost");
 
                     b.Navigation("LostAnimalPost");
 

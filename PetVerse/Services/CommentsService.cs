@@ -19,7 +19,7 @@ namespace PetVerse.Services
         private void ValidateData(CreateCommentDTO dto)
         {
             var errors = new List<string>();
-            List<string> types = ["lost", "adoption", "service"];
+            List<string> types = ["lost", "adoption", "service", "event"];
 
             if (string.IsNullOrEmpty(dto.Comment) || string.IsNullOrWhiteSpace(dto.Comment))
                 errors.Add("Comment is required");
@@ -29,7 +29,8 @@ namespace PetVerse.Services
                 "lost" => _context.LostAnimalPosts.Any(p => p.Id == dto.PostId),
                 "adoption" => _context.AnimalAdoptionPosts.Any(p => p.Id == dto.PostId),
                 "service" => _context.BusinessPosts.Any(p => p.Id == dto.PostId),
-                _ => throw new ValidationException("Invalid type! Type must be: lost|adoption|service")
+                "event" => _context.EventPosts.Any(p=>p.Id == dto.PostId),
+                _ => throw new ValidationException("Invalid type! Type must be: lost|adoption|service|event")
             };
 
             if (!postExists)
@@ -73,6 +74,7 @@ namespace PetVerse.Services
                 LostAnimalPostId = dto.Type == "lost" ? dto.PostId : null,
                 AnimalAdoptionPostId = dto.Type == "adoption" ? dto.PostId : null,
                 BusinessPostId = dto.Type == "service" ? dto.PostId : null,
+                EventPostId = dto.Type == "event" ? dto.PostId : null
             };
 
             await SaveToDbAsync(comment);
@@ -91,6 +93,7 @@ namespace PetVerse.Services
                 "lost" => await _context.LostAnimalPosts.AnyAsync(p => p.Id == commentParameters.PostId),
                 "adoption" => await _context.AnimalAdoptionPosts.AnyAsync(p => p.Id == commentParameters.PostId),
                 "service" => await _context.BusinessPosts.AnyAsync(p => p.Id == commentParameters.PostId),
+                "event" => await _context.EventPosts.AnyAsync(p => p.Id == commentParameters.PostId),
                 _ => false
             };
 
@@ -100,6 +103,7 @@ namespace PetVerse.Services
             return _context.Comments.Where(x =>
                 (commentParameters.Type == "lost" && x.LostAnimalPostId == commentParameters.PostId) ||
                 (commentParameters.Type == "adoption" && x.AnimalAdoptionPostId == commentParameters.PostId) ||
+                (commentParameters.Type == "event" && x.EventPostId == commentParameters.PostId) ||
                 (commentParameters.Type == "service" && x.BusinessPostId == commentParameters.PostId))
                 .Select(x => new CommentResponseDTO
                 {
