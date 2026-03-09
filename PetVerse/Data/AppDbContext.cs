@@ -143,6 +143,15 @@ namespace PetVerse.Data
                 .HasForeignKey(e => e.EventPostId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // User cannot engage with the same type of engagement on the same post
+            builder.Entity<Engagement>()
+                .Property(e => e.UserId)
+                .HasMaxLength(450);
+
+            builder.Entity<Engagement>()
+                .HasIndex(e => new { e.EventPostId, e.UserId, e.Type })
+                .IsUnique();
+
         }
 
 

@@ -45,7 +45,7 @@ namespace PetVerse.Services
                 if (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
                 {
                     await transaction.RollbackAsync();
-                    throw new ValidationException("Engagement for this event from this user already exists!");
+                    throw new ValidationException($"This type of engagement ({engagement.Type}) for this event from this user already exists!");
                 }
                 await transaction.RollbackAsync();
                 throw new InvalidOperationException("Database error while creating engagement");
