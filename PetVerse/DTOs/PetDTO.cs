@@ -11,7 +11,7 @@ namespace PetVerse.DTOs
         public required string Name { get; set; }
 
         [Required(ErrorMessage = "Pet kind is required, Kind can be: Dog|Cat|Other")]
-        public required Kind Kind { get; set; }
+        public required string Kind { get; set; }
 
         [Required(ErrorMessage = "BirthDate is required")]
         public required DateTime BirthDate { get; set; }

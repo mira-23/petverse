@@ -24,7 +24,7 @@ public static class DbInitializer
                 Pet = new Pet
                 {
                     Name = "Buddy",
-                    Kind = Kind.Dog,
+                    Kind = "Dog",
                     BirthDate = new DateTime(2025, 1, 1)
                 },
             };

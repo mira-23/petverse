@@ -43,6 +43,11 @@ namespace PetVerse.Controllers
 
             if (userForRegistrationDTO.Pet != null)
             {
+                List<string> petTypes = ["dog","cat","other"];
+                if(!petTypes.Contains(userForRegistrationDTO.Pet.Kind.ToLower()))
+                {
+                    return BadRequest("Pet type must be cat|dog|other");
+                }
                 var pet = new Pet
                 {
                     Name = userForRegistrationDTO.Pet.Name,
