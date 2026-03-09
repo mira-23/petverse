@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetVerse.Data;
 
@@ -11,9 +12,11 @@ using PetVerse.Data;
 namespace PetVerse.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260309161116_PetTypeFix")]
+    partial class PetTypeFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -399,6 +402,9 @@ namespace PetVerse.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("EventPostId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("LostAnimalPostId")
                         .HasColumnType("int");
 
@@ -419,11 +425,79 @@ namespace PetVerse.Migrations
 
                     b.HasIndex("BusinessPostId");
 
+                    b.HasIndex("EventPostId");
+
                     b.HasIndex("LostAnimalPostId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("PetVerse.Models.Engagement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EventPostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("EventPostId", "UserId", "Type")
+                        .IsUnique();
+
+                    b.ToTable("Engagements");
+                });
+
+            modelBuilder.Entity("PetVerse.Models.EventPost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("From")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Published")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("To")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EventPosts");
                 });
 
             modelBuilder.Entity("PetVerse.Models.LostAnimalPost", b =>
@@ -688,6 +762,10 @@ namespace PetVerse.Migrations
                         .HasForeignKey("BusinessPostId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("PetVerse.Models.EventPost", "EventPost")
+                        .WithMany("Comments")
+                        .HasForeignKey("EventPostId");
+
                     b.HasOne("PetVerse.Models.LostAnimalPost", "LostAnimalPost")
                         .WithMany("Comments")
                         .HasForeignKey("LostAnimalPostId")
@@ -703,7 +781,39 @@ namespace PetVerse.Migrations
 
                     b.Navigation("BusinessPost");
 
+                    b.Navigation("EventPost");
+
                     b.Navigation("LostAnimalPost");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PetVerse.Models.Engagement", b =>
+                {
+                    b.HasOne("PetVerse.Models.EventPost", "EventPost")
+                        .WithMany("Engagements")
+                        .HasForeignKey("EventPostId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PetVerse.Entities.User", "User")
+                        .WithMany("Engagements")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventPost");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PetVerse.Models.EventPost", b =>
+                {
+                    b.HasOne("PetVerse.Entities.User", "User")
+                        .WithMany("EventPosts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -770,6 +880,10 @@ namespace PetVerse.Migrations
 
                     b.Navigation("Comments");
 
+                    b.Navigation("Engagements");
+
+                    b.Navigation("EventPosts");
+
                     b.Navigation("LostAnimalPosts");
 
                     b.Navigation("UserToBusinessProfileMapping");
@@ -796,6 +910,13 @@ namespace PetVerse.Migrations
                     b.Navigation("BusinessPosts");
 
                     b.Navigation("UserToBusinessProfileMapping");
+                });
+
+            modelBuilder.Entity("PetVerse.Models.EventPost", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Engagements");
                 });
 
             modelBuilder.Entity("PetVerse.Models.LostAnimalPost", b =>
