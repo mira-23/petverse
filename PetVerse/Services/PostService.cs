@@ -343,6 +343,38 @@ namespace PetVerse.Services
                 postParameters.PageNumber);
         }
 
+        public List<AnimalAdoptionPostRepsonseDTO> FindAllAnimalAdoptionPosts(string userId, int shelterId)
+        {
+            var shelterPosts = _context.AnimalAdoptionPosts.Where(x=>x.ShelterProfileId == shelterId && x.UserId == userId).ToList();
+            var adoptionPostDTOs = new List<AnimalAdoptionPostRepsonseDTO>();
+
+            adoptionPostDTOs.AddRange(shelterPosts.Select(sp => new AnimalAdoptionPostRepsonseDTO
+            {
+                Id = sp.Id,
+                Title = sp.Title,
+                Body = sp.Body,
+                UserId = userId,
+                Published = sp.Published,
+                PhotoPath = $"Images/AnimalAdoptions/{sp.PhotoPath}",
+                Type = sp.Type,
+                ShelterId = sp.ShelterProfileId,
+                AdoptedAt = sp.AdoptedAt,
+                Status = sp.Status,
+                AdoptionRequestResponseDTOs = [.. _context.AdoptionRequests.Where(ar => ar.AdoptionPostId == sp.Id).Select(ar => new AdoptionRequestResponseDTO{
+                    Id = ar.Id,
+                    AdoptionPostId = ar.AdoptionPostId,
+                    Message = ar.Message,
+                    Status = ar.Status
+                })]
+            }));
+            return adoptionPostDTOs;
+        }
+
+        public List<AnimalAdoptionPostRepsonseDTO> GetAnimalAdoptionPosts(string userId, int shelterId)
+        {
+            return FindAllAnimalAdoptionPosts(userId,shelterId).OrderByDescending(x => x.Published).ToList();
+        }
+
         public async Task<FoundAnimalPostRepsonseDTO> MarkLostAnimalAsFound(int id, string userId)
         {
             var post = _context.LostAnimalPosts.FirstOrDefault(x => x.Id == id);

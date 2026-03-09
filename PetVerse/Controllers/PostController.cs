@@ -259,20 +259,21 @@ namespace PetVerse.Controllers
                 var post = await _postService.GetAnimalAdoptionPostByIdAsync(id);
                 if (post == null) return NotFound();
 
-                var responseDTO = new AnimalAdoptionPostRepsonseDTO
-                {
-                    PhotoPath = $"{Request.Scheme}://{Request.Host}/Images/AnimalAdoptions/{post.PhotoPath}",
-                    Title = post.Title,
-                    Type = post.Type,
-                    Body = post.Body,
-                    ShelterId = post.ShelterProfileId,
-                    UserId = post.UserId,
-                    Published = post.Published,
-                    AdoptedAt = post.AdoptedAt,
-                    Status = post.Status
-                };
-                return Ok(responseDTO);
-            }
+            var responseDTO = new AnimalAdoptionPostRepsonseDTO
+            {
+                Id = post.Id,
+                PhotoPath = $"{Request.Scheme}://{Request.Host}/Images/AnimalAdoptions/{post.PhotoPath}",
+                Title = post.Title,
+                Type = post.Type,
+                Body = post.Body,
+                ShelterId = post.ShelterProfileId,
+                UserId = post.UserId,
+                Published = post.Published,
+                AdoptedAt = post.AdoptedAt,
+                Status = post.Status
+            };
+            return Ok(responseDTO);
+        }
 
             [HttpPost("business/business_post")]
             public async Task<IActionResult> CreateBusinessPost(CreateBusinessPostDTO dto)
@@ -354,13 +355,47 @@ namespace PetVerse.Controllers
                 return Ok(responseDTO);
             }
 
-            [HttpGet]
-            public IActionResult GetPosts([FromQuery] PostParameters postParameters)
+        [HttpGet]
+        public IActionResult GetPosts([FromQuery] PostParameters postParameters)
+        {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var posts = _postService.GetPosts(postParameters, userId);
+            return Ok(posts);
+        }
+
+        [HttpGet("shelter/{id}/animal_adoption")]
+        public async Task<IActionResult> GetAnimalAdoptionPostsAsync(int id)
+        {
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
             {
-                string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var posts = _postService.GetPosts(postParameters, userId);
-                return Ok(posts);
+                return Unauthorized();
             }
+
+            //dummy dto to use for authorization
+            CreateAnimalAdoptionPostDTO dto = new()
+            {
+                Title = "",
+                Body = "",
+                Photo = new FormFile(Stream.Null, 0, 0, "", ""),
+                Type = "",
+                ShelterId = id
+            };
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(
+            User,
+            dto,
+            "IsShelter");
+
+            if (!authorizationResult.Succeeded)
+            {
+                return Forbid();
+            }
+            
+            var posts = _postService.GetAnimalAdoptionPosts(userId, id);
+            return Ok(posts);
+        }
 
             [HttpPut("user/lost_animal/{id}")]
             public async Task<IActionResult> MarkLostAnimalAsFound(int id)
