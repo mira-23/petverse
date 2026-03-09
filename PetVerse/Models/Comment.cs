@@ -16,6 +16,8 @@ namespace PetVerse.Models
         public AnimalAdoptionPost? AnimalAdoptionPost { get; set; }
         public int? BusinessPostId { get; set; }
         public BusinessPost? BusinessPost { get; set; }
+        public int? EventPostId { get; set; }
+        public EventPost? EventPost { get; set; }
     }
 }
 
