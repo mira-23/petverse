@@ -364,7 +364,8 @@ namespace PetVerse.Services
                     Id = ar.Id,
                     AdoptionPostId = ar.AdoptionPostId,
                     Message = ar.Message,
-                    Status = ar.Status
+                    Status = ar.Status,
+                    UserName = ar.UserName
                 })]
             }));
             return adoptionPostDTOs;

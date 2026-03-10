@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using PetVerse.Data;
 using PetVerse.DTOs;
+using PetVerse.Entities;
 using PetVerse.Models;
 
 namespace PetVerse.Services
@@ -76,7 +77,8 @@ namespace PetVerse.Services
                 AdoptionPostId = dto.AdoptionPostId,
                 Message = dto.Message,
                 Status = "new",
-                UserId = userId
+                UserId = userId,
+                UserName = _context.Users.First(x=>x.Id == userId).UserName
             };
 
             await SaveToDbAsync(request);

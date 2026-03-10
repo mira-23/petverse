@@ -59,7 +59,8 @@ namespace PetVerse.Controllers
                 Id = result.Id,
                 AdoptionPostId = result.AdoptionPostId,
                 Message = result.Message,
-                Status = result.Status
+                Status = result.Status,
+                UserName = result.UserName
             };
 
             return CreatedAtAction(nameof(GetAdoptionRequestById), new { id = result.Id }, responseDTO);
@@ -81,7 +82,8 @@ namespace PetVerse.Controllers
                 Id = request.Id,
                 AdoptionPostId = request.AdoptionPostId,
                 Message = request.Message,
-                Status = request.Status
+                Status = request.Status,
+                UserName = request.UserName
             };
             return Ok(responseDTO);
         }
